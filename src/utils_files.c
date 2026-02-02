@@ -1,5 +1,9 @@
+// ------------------ LIBRARIES ------------------
 #include "./main.h"
- 
+
+
+
+// ---------------- FUNCTIONS ------------------
 void split_path(const char *fullpath, char *path, char *filename, char *extension) {
     const char *last_slash = strrchr(fullpath, '/');
     const char *last_dot = strrchr(fullpath, '.');

@@ -1,24 +1,25 @@
+// ------------------ LIBRARIES ------------------
 #include "./main.h"
 
+
+
+// ------------------ GLOBAL VARIABLES ------------------
 FILE* ofile = NULL; // The output handler for the project run (same variable name as in modules)
 
+
+
+// ------------------ MAIN FUNCTION ------------------
 int main(int argc, char *argv[]) {
-    int n = 0;
-
-    ofile = stdout; // Default output to stdout
-    ofile = set_output_test_file(PROJOUTFILENAME);
-
-    fprintf(ofile, "Starting module args ...\n");
-    process_arguments(argc, argv);
-    fprintf(ofile, "Finished module args!!\n");
-
-    fprintf(ofile, "Starting module 2 ...\n");
-    n = fib(FIBNUM);
-    fprintf(ofile, "Fibonacci of %d is: %d\n", FIBNUM, n);
-    fprintf(ofile, "Finished module 2!!\n");
     
-    printf("All modules executed successfully!\n\n");
-    fprintf(ofile, "All modules executed successfully!\n\n");
+
+    ofile = stdout; // Puntero default del OutputFIle  (ya estaba hecho por la bro de la Dolors)
+
+    // Chequear y obtener args
+    // Chequear y abrir Input/Output files
+    // Llamar al scanner hasta EOF
+    // Cerrar ficheros y liberar memoria
+    
+    printf("TODO WORKEA PERFECTAMENTE ;)\n");
 
     fclose(ofile); 
     return 0;

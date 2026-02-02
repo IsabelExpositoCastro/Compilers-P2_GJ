@@ -25,8 +25,8 @@ target_include_directories(utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 message(STATUS "   - (${PROJECT_NAME}) Added utils library")
 
 # Add modules subdirectories
-add_subdirectory(module_args)
-add_subdirectory(module_2)
+# add_subdirectory(module_args)
+# add_subdirectory(module_2)
 message(STATUS "   - (${PROJECT_NAME}) Added modules subdirectories")
 
 message(STATUS "(${PROJECT_NAME}) Finished including module subdirectories.")

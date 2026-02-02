@@ -1,12 +1,14 @@
 #ifndef UTILS_FILES_H
 #define UTILS_FILES_H
- 
+
+// ------------------ LIBRARIES ------------------
 #include <stdio.h>
 #include <stdlib.h>     // To set env for time zone
 #include <string.h>     // For filename manipulation    
 #include <time.h>       // For time-stamp of output logs filenames
 
-// Global defines
+
+// ---------------- GLOBAL DEFINES ------------------
 #define MAXFILENAME 256 // Maximum length of the filename for output logs
 #define MAXFILEEXT 64   // Maximum length of the file extension
 
