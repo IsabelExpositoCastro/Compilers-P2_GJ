@@ -71,3 +71,4 @@ The project skeleton with all folders and files is the following one:
 
 ## 🛠️ **Next Steps**
 A partir de aquí, debemos ampliar y mejorar el README
+

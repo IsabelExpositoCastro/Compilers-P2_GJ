@@ -53,5 +53,5 @@ message(STATUS " - (${PROJECT_NAME}) Added tests/ directory")
 # This executable links together all module libraries.
 # (to have modular test for each module in parallel)
 add_executable(lexer src/main.c)
-target_link_libraries(lexer PRIVATE utils)
-message(STATUS " - (${PROJECT_NAME}) Modules Template Main executable 'lexer' linked with utils")
+target_link_libraries(lexer PRIVATE utils scanner_module input_handler_module error_handler_module counter_module)
+message(STATUS " - (${PROJECT_NAME}) Modules Template Main executable 'lexer' linked with all modules")
