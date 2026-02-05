@@ -19,4 +19,4 @@
 # Add utils library from the top-level src folder
 add_library(scanner_module scanner.c)
 target_include_directories(scanner_module PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(scanner_module PRIVATE utils)
+target_link_libraries(scanner_module PRIVATE utils automatas_module)

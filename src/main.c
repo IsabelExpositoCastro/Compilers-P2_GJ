@@ -12,18 +12,19 @@ FILE* ofile = NULL; // The output handler for the project run (same variable nam
 // ------------------ MAIN FUNCTION ------------------
 int main(int argc, char *argv[]) {
     
-
-    ofile = stdout; // Puntero default del OutputFIle  (ya estaba hecho por la bro de la Dolors)
-    FILE* InputFile = Open_InputFile(argc, argv); // Abrir el InputFile de forma rápida
-    StartScanner(InputFile, ofile); 
+    // Configurar output (stdout por defecto)
+    ofile = stdout;
     
-    // Chequear y obtener args
-    // Chequear y abrir Input/Output files
-    // Llamar al scanner hasta EOF
-    // Cerrar ficheros y liberar memoria
+    // Para ahora, simplemente leer de stdin y escribir a stdout
+    // TODO: Implementar Open_InputFile() después
+    FILE* InputFile = stdin;
     
-    printCasual();
-
-    fclose(ofile); 
+    fprintf(ofile, "=== SCANNER TEST - SPECIAL CHARACTERS ===\n\n");
+    
+    // Ejecutar el scanner
+    StartScanner(InputFile, ofile);
+    
+    fprintf(ofile, "\n=== END OF SCAN ===\n");
+    
     return 0;
 }
