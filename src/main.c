@@ -1,6 +1,7 @@
 // ------------------ LIBRARIES ------------------
 #include "./main.h"
 #include "scanner_module/scanner.h"
+#include "input_handler_module/input_handler.h"
 
 
 
@@ -15,9 +16,11 @@ int main(int argc, char *argv[]) {
     // Configurar output (stdout por defecto)
     ofile = stdout;
     
-    // Para ahora, simplemente leer de stdin y escribir a stdout
-    // TODO: Implementar Open_InputFile() después
-    FILE* InputFile = stdin;
+    // Abrir archivo de entrada
+    FILE* InputFile = Open_InputFile(argc, argv);
+    if (InputFile == NULL) {
+        InputFile = stdin;  // Si no se proporciona archivo, usar stdin
+    }
     
     fprintf(ofile, "=== SCANNER TEST - SPECIAL CHARACTERS ===\n\n");
     
@@ -25,6 +28,11 @@ int main(int argc, char *argv[]) {
     StartScanner(InputFile, ofile);
     
     fprintf(ofile, "\n=== END OF SCAN ===\n");
+    
+    // Cerrar archivo si se abrió
+    if (InputFile != stdin && InputFile != NULL) {
+        fclose(InputFile);
+    }
     
     return 0;
 }

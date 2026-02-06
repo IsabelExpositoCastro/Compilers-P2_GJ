@@ -92,7 +92,4 @@ int is_accepting_state(automaton2_t* automaton, int state);
 void print_automaton_info(automaton2_t* automaton, const char* name);
 
 
-// ============ INICIALIZACIÓN GENERAL ============
-void initialize_automaton();
-
 #endif // AUTOMATON_DEFINITION_H
