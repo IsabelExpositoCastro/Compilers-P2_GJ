@@ -46,6 +46,7 @@ typedef struct {
     int num_accepting_states;   // Número de estados de aceptación
     int** transition_matrix;    // Matriz de transición: [estado][símbolo] = estado_destino
     category_t category;        // Categoría del autómata (todos los tokens de este autómata = misma categoría)
+    char* category_name;        
 } automaton2_t;
 
 
