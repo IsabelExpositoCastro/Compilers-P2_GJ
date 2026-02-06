@@ -19,8 +19,20 @@ automaton2_t* create_empty_automaton() {
     automaton->num_accepting_states = 0;
     automaton->transition_matrix = NULL;
     automaton->category = CAT_NONRECOGNIZED;
-
+    automaton->category_name = "CAT_NONRECOGNIZED";
     return automaton;
+}
+
+void set_category_name(automaton2_t* automaton, char* category_name) {
+    if (!automaton || !category_name) return;
+    if (automaton->category_name) {
+        free(automaton->category_name);
+    }
+    int len = strlen(category_name);
+    automaton->category_name = (char*)malloc((len + 1) * sizeof(char));
+    if (automaton->category_name) {
+        strcpy(automaton->category_name, category_name);
+    }
 }
 
 void set_alphabet(automaton2_t* automaton, const char* alphabet) {

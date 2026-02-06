@@ -5,34 +5,21 @@
 
 
 
-// ------------------ GLOBAL VARIABLES ------------------
-FILE* ofile = NULL; // The output handler for the project run (same variable name as in modules)
-
-
-
 // ------------------ MAIN FUNCTION ------------------
 int main(int argc, char *argv[]) {
-    
-    // Configurar output (stdout por defecto)
-    ofile = stdout;
-    
-    // Abrir archivo de entrada
-    FILE* InputFile = Open_InputFile(argc, argv);
-    if (InputFile == NULL) {
-        InputFile = stdin;  // Si no se proporciona archivo, usar stdin
-    }
-    
-    fprintf(ofile, "=== SCANNER TEST - SPECIAL CHARACTERS ===\n\n");
-    
+
+    //Input / Output
+    FILE* ofile = Open_OutputFile(argc, argv);
+    FILE* ifile = Open_InputFile(argc, argv);
+
+
     // Ejecutar el scanner
-    StartScanner(InputFile, ofile);
+    StartScanner(ifile, ofile);
     
-    fprintf(ofile, "\n=== END OF SCAN ===\n");
-    
-    // Cerrar archivo si se abrió
-    if (InputFile != stdin && InputFile != NULL) {
-        fclose(InputFile);
-    }
-    
+    if (ifile != stdin && ifile != NULL) {
+        fclose(ifile);}
+    if (ofile != NULL && ofile != stdout) {
+        fclose(ofile);}
+
     return 0;
 }
