@@ -7,4 +7,4 @@
 
 // ------------------- FUNCTIONS --------------------
 FILE* Open_InputFile(int argc, char* argv[]); // Opens the input file if passed as an argument, otherwise returns NULL (to use stdin)
-
+FILE* Open_OutputFile(int argc, char* argv[]);
