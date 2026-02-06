@@ -73,5 +73,6 @@ The project skeleton with all folders and files is the following one:
 A partir de aquí, debemos ampliar y mejorar el README
 
 
-si tenemos ife({[
+si tenemos ife({[ entonces el lexer debería de identificar los lexemas {if, KEYWORD} - {e, IDENTIFIER} - {(, SPECIAL_CHAR} - 
+{{, SPECIAL_CHAR} - {[, SPECIAL_CHAR}
 
