@@ -19,6 +19,8 @@ automaton2_t* create_literal_automaton() {
     // Set the alphabet: All characters inside the literal except the closing quote
     set_alphabet(automaton, LITERAL_ALPHABET);
 
+    set_category_name(automaton, "LITERAL");
+
     // Set up the number of states: 3 states (0 - initial, 1 - inside literal, 2 - accepting)
     set_num_states(automaton, 3, 1);  // 3 states and 1 accepting state
     set_initial_state(automaton, 0);  // The initial state is 0
