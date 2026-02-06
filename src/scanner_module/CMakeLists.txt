@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# src/input_handler_module/CMakeLists.txt
+# src/scanner_module/CMakeLists.txt
 # 
 # This file includes each module directory (sub-library) so they can be
 # built individually with their own CMakeLists.txt.
@@ -17,6 +17,6 @@
 # -----------------------------------------------------------------------------
 
 # Add utils library from the top-level src folder
-add_library(input_handler_module input_handler.c module_args.c)
-target_include_directories(input_handler_module PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(input_handler_module PRIVATE utils)
+add_library(scanner_module scanner.c)
+target_include_directories(scanner_module PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(scanner_module PRIVATE utils automatas_module)

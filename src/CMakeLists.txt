@@ -16,8 +16,6 @@
 # CMakeLists.txt files respectively.
 # -----------------------------------------------------------------------------
 
-message(STATUS "(${PROJECT_NAME}) Adding all module subdirectories in src/...")
-message(STATUS " - (${PROJECT_NAME}) (src) Configuring source modules and utils...")
 
 # Add utils library from the top-level src folder
 add_library(utils STATIC utils_files.c)
@@ -25,8 +23,8 @@ target_include_directories(utils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 message(STATUS "   - (${PROJECT_NAME}) Added utils library")
 
 # Add modules subdirectories
-# add_subdirectory(module_args)
-# add_subdirectory(module_2)
-message(STATUS "   - (${PROJECT_NAME}) Added modules subdirectories")
-
-message(STATUS "(${PROJECT_NAME}) Finished including module subdirectories.")
+add_subdirectory(automatas_module)
+add_subdirectory(input_handler_module)
+add_subdirectory(scanner_module)
+add_subdirectory(error_handler_module)
+add_subdirectory(counter_module)

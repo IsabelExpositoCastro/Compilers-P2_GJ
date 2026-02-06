@@ -1,5 +1,7 @@
 // ------------------ LIBRARIES ------------------
 #include "./main.h"
+#include "scanner_module/scanner.h"
+#include "input_handler_module/input_handler.h"
 
 
 
@@ -11,16 +13,26 @@ FILE* ofile = NULL; // The output handler for the project run (same variable nam
 // ------------------ MAIN FUNCTION ------------------
 int main(int argc, char *argv[]) {
     
-
-    ofile = stdout; // Puntero default del OutputFIle  (ya estaba hecho por la bro de la Dolors)
-
-    // Chequear y obtener args
-    // Chequear y abrir Input/Output files
-    // Llamar al scanner hasta EOF
-    // Cerrar ficheros y liberar memoria
+    // Configurar output (stdout por defecto)
+    ofile = stdout;
     
-    printf("TODO WORKEA PERFECTAMENTE ;)\n");
-
-    fclose(ofile); 
+    // Abrir archivo de entrada
+    FILE* InputFile = Open_InputFile(argc, argv);
+    if (InputFile == NULL) {
+        InputFile = stdin;  // Si no se proporciona archivo, usar stdin
+    }
+    
+    fprintf(ofile, "=== SCANNER TEST - SPECIAL CHARACTERS ===\n\n");
+    
+    // Ejecutar el scanner
+    StartScanner(InputFile, ofile);
+    
+    fprintf(ofile, "\n=== END OF SCAN ===\n");
+    
+    // Cerrar archivo si se abrió
+    if (InputFile != stdin && InputFile != NULL) {
+        fclose(InputFile);
+    }
+    
     return 0;
 }

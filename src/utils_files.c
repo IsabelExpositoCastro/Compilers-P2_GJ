@@ -1,5 +1,7 @@
 // ------------------ LIBRARIES ------------------
 #include "./main.h"
+#include "counter_module/counter.h"
+
 
 
 
@@ -89,4 +91,12 @@ FILE* set_output_test_file(const char* filename) {
     }
     fflush(ofile);
     return ofile;
+}
+
+
+void call_print_counts() {
+    // TODO: Implementar funciones de conteo
+    // if (COUNT_CONFIG_FLAG) {
+    //     FILE* opens = fopen(OUTPUT_COUNT_FILE, "a");
+    // }
 }
