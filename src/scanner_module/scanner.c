@@ -24,6 +24,11 @@ void initialize_all_automata() {
     // TODO: Agregar más autómatas (keywords, identifiers, numbers, etc.)
     
     num_automata = 1;  // Por ahora solo tenemos SPECIAL_CHARACTERS
+
+    all_automata[1] = create_literal_automaton();
+    lookahead_automata[1] = create_literal_automaton();
+    num_automata++;
+
     
     printf("[SCANNER] Initialized %d automata\n", num_automata);
 }
