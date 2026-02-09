@@ -226,7 +226,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
 
             if(can_any_automaton_continue(states, num_automata, c)) {
                 if(!last_valid.is_valid){
-                    if(last_valid.length > 0) {
+                    if(last_valid.length > 1) {
                         fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
                     }
                     for (int i = 0; i < last_valid.length; i++) {

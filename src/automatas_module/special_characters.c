@@ -9,7 +9,7 @@
 
 // Estados
 #define STATE_INITIAL 0
-#define STATE_ACCEPT 2
+#define STATE_ACCEPT 1
 
 automaton2_t* create_special_char_automaton() {
     automaton2_t* automaton = create_empty_automaton();
@@ -20,7 +20,7 @@ automaton2_t* create_special_char_automaton() {
 
     // 2. ASIGNAR NÚMERO DE ESTADOS (2 estados: inicial y aceptación)
     //    num_accepting = 1 (solo q_accept es de aceptación)
-    set_num_states(automaton, 3, 1);
+    set_num_states(automaton, 2, 1);
 
     // 3. ASIGNAR ESTADO INICIAL
     set_initial_state(automaton, STATE_INITIAL);
@@ -36,8 +36,7 @@ automaton2_t* create_special_char_automaton() {
     
     // Llenar la matriz que ya está asignada en set_num_states
     for (int i = 0; i < SPECIAL_CHARS_COUNT; i++) {
-        automaton->transition_matrix[STATE_INITIAL][i] = 1;
-        automaton->transition_matrix[1][i] = 2;
+        automaton->transition_matrix[STATE_INITIAL][i] = STATE_ACCEPT;
         automaton->transition_matrix[STATE_ACCEPT][i] = -1;
     }
 
