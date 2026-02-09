@@ -17,17 +17,17 @@ FILE* Open_InputFile(int argc, char* argv[]) {
         }
         return inputFile; // Return the opened file pointer
     }
-    return NULL; // No file provided, will use stdin
+    return stdin; // No file provided, will use stdin
 }
 
 
 //Create the output file
-FILE* set_output_test_file(const char* filename) {
+FILE* set_output_t_file(const char* filename) {
     FILE* ofile = stdout;  // Default to stdout
 
     if (strcmp(filename, "stdout") != 0) {
         // If filename is not "stdout", create a new file
-        ofile = fopen(filename, "w");
+        ofile = fopen("out.txt", "w");
         if (ofile == NULL) {
             fprintf(stderr, "Error opening output file %s\n", filename);
             return NULL;

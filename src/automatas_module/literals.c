@@ -9,7 +9,7 @@
 
 // ----------------- LITERAL AUTOMATON -----------------
 
-#define LITERAL_ALPHABET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"  // Alphabet for literal characters
+#define LITERAL_ALPHABET "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\t"  // Alphabet for literal characters
 
 // Function to create the literal automaton (DFA)
 automaton2_t* create_literal_automaton() {
@@ -19,7 +19,7 @@ automaton2_t* create_literal_automaton() {
     // Set the alphabet: All characters inside the literal except the closing quote
     set_alphabet(automaton, LITERAL_ALPHABET);
 
-    set_category_name(automaton, "LITERAL");
+    //set_category_name(automaton, "LITERAL");
 
     // Set up the number of states: 3 states (0 - initial, 1 - inside literal, 2 - accepting)
     set_num_states(automaton, 3, 1);  // 3 states and 1 accepting state
@@ -77,27 +77,27 @@ automaton2_t* create_literal_automaton() {
 // ----------------- PROCESS LITERAL FUNCTION -----------------
 
 // Function to process literals using the automaton
-void process_literal(scanner_context_t* ctx) {
-    // Initialize the literals automaton
-    automaton2_t* literal_automaton = create_literal_automaton();
+// void process_literal(scanner_context_t* ctx) {
+//     // Initialize the literals automaton
+//     automaton2_t* literal_automaton = create_literal_automaton();
     
-    // Initialize automaton states (the states are set up when creating the automaton)
-    automaton_state_t states[MAX_AUTOMATA];
-    initialize_automaton_states(states, &literal_automaton, 1);
+//     // Initialize automaton states (the states are set up when creating the automaton)
+//     automaton_state_t states[MAX_AUTOMATA];
+//     initialize_automaton_states(states, &literal_automaton, 1);
 
-    char c = read_char(ctx); // First character after the opening quote
-    while (c != EOF && c != '\n' && c != '"') {
-        // Continue processing the characters inside the literal
-        process_automata_transition(states, 1, c);  // Consume the character in the automaton
-        c = read_char(ctx);  // Read next character
-    }
+//     char c = read_char(ctx); // First character after the opening quote
+//     while (c != EOF && c != '\n' && c != '"') {
+//         // Continue processing the characters inside the literal
+//         process_automata_transition(states, 1, c);  // Consume the character in the automaton
+//         c = read_char(ctx);  // Read next character
+//     }
 
-    // Check if we found the closing quote
-    if (c == '"') {
-        // Successfully found the closing quote, accept token
-        emit_token(CAT_LITERAL);
-    } else {
-        // Error: unclosed literal or invalid character inside
-        emit_error("Unclosed literal or invalid character");
-    }
-}
+//     // Check if we found the closing quote
+//     if (c == '"') {
+//         // Successfully found the closing quote, accept token
+//         emit_token(CAT_LITERAL);
+//     } else {
+//         // Error: unclosed literal or invalid character inside
+//         emit_error("Unclosed literal or invalid character");
+//     }
+// }

@@ -7,4 +7,4 @@
 
 // ------------------- FUNCTIONS --------------------
 FILE* Open_InputFile(int argc, char* argv[]); // Opens the input file if passed as an argument, otherwise returns NULL (to use stdin)
-FILE* set_output_test_file(const char* filename); // Creates the output file based on the provided filename, defaults to stdout if "stdout" is specified
+FILE* set_output_t_file(const char* filename); // Creates the output file based on the provided filename, defaults to stdout if "stdout" is specified

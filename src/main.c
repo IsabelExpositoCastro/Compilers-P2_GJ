@@ -9,9 +9,8 @@
 int main(int argc, char *argv[]) {
 
     //Input / Output
-    FILE* ofile = Open_OutputFile(argc, argv);
+    FILE* ofile = set_output_t_file(argv[argc - 1]);
     FILE* ifile = Open_InputFile(argc, argv);
-
 
     // Ejecutar el scanner
     StartScanner(ifile, ofile);

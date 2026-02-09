@@ -25,9 +25,9 @@ void initialize_all_automata() {
     
     num_automata = 1;  // Por ahora solo tenemos SPECIAL_CHARACTERS
 
-    all_automata[1] = create_literal_automaton();
-    lookahead_automata[1] = create_literal_automaton();
-    num_automata++;
+    //all_automata[1] = create_literal_automaton();
+    //lookahead_automata[1] = create_literal_automaton();
+    //num_automata++;
 
     
     printf("[SCANNER] Initialized %d automata\n", num_automata);
@@ -199,7 +199,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
         .buffer = DEFAULT_TOKEN,
         .length = 0,
         .category = CAT_NONRECOGNIZED,
-        .is_valid = 0
+        .is_valid = 1
     };
     int c;
 
@@ -208,8 +208,11 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
             if(last_valid.length > 0) {
                 fprintf(OutputFile, "<%s, %d> ", token_buffer, last_valid.category);
             }
+            for (int i = 0; i < last_valid.length; i++) {
+                token_buffer[i] = '\0';
+                last_valid.buffer[i] = '\0';
+            }
             token_pos = 0;
-            last_valid.buffer[0] = '\0';
             last_valid.length = 0;
             last_valid.category = CAT_NONRECOGNIZED;
             last_valid.is_valid = 0;
@@ -218,40 +221,56 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
                 fprintf(OutputFile, "\n");
                 ctx.line_num++;
             }
-        }
-        int next_char = peek_char(&ctx);
+        }else {
+            int next_char = peek_char(&ctx);
 
-        if(can_any_automaton_continue(states, num_automata, c)) {
-            process_automata_transition(states, num_automata, (char)c);
-            token_buffer[token_pos] = (char)c;
-            token_pos++;
-            last_valid.buffer[token_pos] = '\0';
-            last_valid.length = token_pos;
-            int accepting_idx = find_accepting_automaton(states, num_automata);
-            if (accepting_idx != -1) {
-                strncpy(last_valid.buffer, token_buffer, token_pos);
-                last_valid.category = states[accepting_idx].automaton->category;
-                last_valid.is_valid = 1;
-                fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
-                for (int i = 0; i < last_valid.length; i++) {
-                    token_buffer[i] = '\0';
-                    last_valid.buffer[i] = '\0';
+            if(can_any_automaton_continue(states, num_automata, c)) {
+                if(!last_valid.is_valid){
+                    if(last_valid.length > 0) {
+                        fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+                    }
+                    for (int i = 0; i < last_valid.length; i++) {
+                        token_buffer[i] = '\0';
+                        last_valid.buffer[i] = '\0';
+                    }
+                    token_pos = 0;
+                    last_valid.length = 0;
+                    last_valid.category = CAT_NONRECOGNIZED;
+                    last_valid.is_valid = 0;
                 }
-                token_pos = 0;
-                last_valid.length = 0;
+                process_automata_transition(states, num_automata, (char)c);
+                token_buffer[token_pos] = (char)c;
+                token_pos++;
+                last_valid.buffer[token_pos] = '\0';
+                last_valid.length = token_pos;
+                last_valid.is_valid = 1;
+                int accepting_idx = find_accepting_automaton(states, num_automata);
+                if (accepting_idx != -1) {
+                    strncpy(last_valid.buffer, token_buffer, token_pos);
+                    last_valid.buffer[token_pos] = '\0';
+                    last_valid.category = states[accepting_idx].automaton->category;
+                    last_valid.is_valid = 1;
+                    fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+                    for (int i = 0; i < last_valid.length; i++) {
+                        token_buffer[i] = '\0';
+                        last_valid.buffer[i] = '\0';
+                    }
+                    token_pos = 0;
+                    last_valid.length = 0;
+                    last_valid.category = CAT_NONRECOGNIZED;
+                    last_valid.is_valid = 0;
+                    reset_automaton_states(states, num_automata);
+                }
+            }else{ //aqui ampliar
+                token_buffer[token_pos] = c;
+                token_pos++;
+                last_valid.buffer[token_pos] = '\0';
+                last_valid.length = token_pos;
                 last_valid.category = CAT_NONRECOGNIZED;
                 last_valid.is_valid = 0;
-                reset_automaton_states(states, num_automata);
+                //if(can_any_automaton_continue(lookahead_automata, num_automata, next_char));
             }
-        }else{ //aqui ampliar
-            token_buffer[token_pos] = c;
-            token_pos++;
-            last_valid.buffer[token_pos] = '\0';
-            last_valid.length = token_pos;
-            last_valid.category = CAT_NONRECOGNIZED;
-            //if(can_any_automaton_continue(lookahead_automata, num_automata, next_char));
         }
-
     }
     free_all_automata();
 }
