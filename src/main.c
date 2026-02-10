@@ -7,18 +7,19 @@
 
 // ------------------ MAIN FUNCTION ------------------
 int main(int argc, char *argv[]) {
-
-    //Input / Output
-    FILE* ofile = set_output_t_file(argv[argc - 1]);
     FILE* ifile = Open_InputFile(argc, argv);
+    if (!ifile) return 1;
 
-    // Ejecutar el scanner
+    FILE* ofile = Open_OutputFile(argc, argv);
+    if (!ofile) {
+        if (ifile != stdin) fclose(ifile);
+        return 1;
+    }
+
     StartScanner(ifile, ofile);
-    
-    if (ifile != stdin && ifile != NULL) {
-        fclose(ifile);}
-    if (ofile != NULL && ofile != stdout) {
-        fclose(ofile);}
+
+    if (ifile != stdin) fclose(ifile);
+    if (ofile != stdout) fclose(ofile);
 
     return 0;
 }

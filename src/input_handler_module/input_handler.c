@@ -1,4 +1,14 @@
-// ------------------- LIBRARIES -------------------
+/*
+ * -----------------------------------------------------------------------------
+ * input_handler.c
+ *
+ * Opens input file from CLI arguments.
+ * - If argv[1] exists: tries to open it in read mode.
+ * - If it fails: returns NULL (caller decides what to do).
+ * - If no file argument: returns stdin.
+ * -----------------------------------------------------------------------------
+ */
+
 #include "./input_handler_module/input_handler.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,48 +18,53 @@
 
 // ------------------- FUNCTIONS --------------------
 FILE* Open_InputFile(int argc, char* argv[]) {
-    // Check if an input file is provided as an argument
     if (argc > 1) {
         FILE* inputFile = fopen(argv[1], "r");
-        if (inputFile == NULL) {
-            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
-            return stdin; // Return NULL to indicate failure
+        if (!inputFile) {
+            fprintf(stderr, "[INPUT_HANDLER] Error: Could not open file %s\n", argv[1]);
+            return NULL;
         }
-        return inputFile; // Return the opened file pointer
+        return inputFile;
     }
-    return stdin; // No file provided, will use stdin
+    return stdin;
 }
 
 
 //Create the output file
-FILE* set_output_t_file(const char* filename) {
-    FILE* ofile = stdout;  // Default to stdout
+static char* build_output_name(const char* input_name) {
+    // output = input_name + "scn"
+    size_t len = strlen(input_name);
+    char* out = (char*)malloc(len + 4); // "scn" + '\0'
+    if (!out) return NULL;
 
-    if (strcmp(filename, "stdout") != 0) {
-        // If filename is not "stdout", create a new file
-        ofile = fopen("out.txt", "w");
-        if (ofile == NULL) {
-            fprintf(stderr, "Error opening output file %s\n", filename);
-            return NULL;
-        }
-    }
-    return ofile;
+    strcpy(out, input_name);
+    strcat(out, "scn");
+    return out;
 }
 
-// FILE* Open_OutputFile(int argc, char* argv[]) {
-//     if (argc > 1) {
-        
-//         char* tempnam = malloc(strlen(argv[1]) + strlen("scn") + 1);
-//         strcpy(tempnam, argv[1]);
-//         strcat(tempnam, "scn");
 
-//         FILE* outputFile = fopen(tempnam, "w");
-//         if (outputFile == NULL) {
-//             printf("Error: Could not open file %s for writing\n", tempnam);
-//             free(tempnam);
-//             return stdout;;
-//         }
-//         return outputFile;
-//     }
-//     return NULL;
-// }
+
+// Opens the output file based on the provided filename, defaults to stdout if "stdout" is specified
+
+
+FILE* Open_OutputFile(int argc, char* argv[]) {
+    // If reading from stdin, output should be stdout (no filename available)
+    if (argc <= 1) return stdout;
+
+    char* outname = build_output_name(argv[1]);
+    if (!outname) {
+        fprintf(stderr, "[INPUT_HANDLER] Error: malloc failed creating output name\n");
+        return NULL;
+    }
+
+    FILE* outputFile = fopen(outname, "w");
+    if (!outputFile) {
+        fprintf(stderr, "[INPUT_HANDLER] Error: Could not open output file %s\n", outname);
+        free(outname);
+        return NULL;
+    }
+
+    free(outname);
+    return outputFile;
+}
+

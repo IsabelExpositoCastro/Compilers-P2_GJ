@@ -10,7 +10,5 @@ extern const char* LITERAL_ALPHABET;
 // Function to create the literal automaton (DFA)
 automaton2_t* create_literal_automaton();
 
-// Function to process literals using the automaton
-void process_literal(scanner_context_t* ctx);
 
 #endif // LITERALS_H
