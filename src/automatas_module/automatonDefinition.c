@@ -103,9 +103,10 @@ num_accepting_states: 1
 accepting states: 2
 category: CAT_CATEGORY
 transitions: states x symbols
-1 2 0
-2 0 1
-0 1 2
+        a b c
+state0: 1 2 0
+state1: 2 0 1
+state2: 0 1 2
 */
 void read_automatas(FILE* file, automaton* a) {
     char line[MAX_LINE];
