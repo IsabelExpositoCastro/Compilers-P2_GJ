@@ -22,6 +22,7 @@ typedef struct {
     int category;               // Categoría del autómata (todos los tokens de este autómata = misma categoría)
     bool need_lookahead;        // Indica si el autómata requiere lookahead para decidir su aceptación
 } automaton;
+// listautomatas[returnedvalue].category_name = "IDENTIFIER" por ejemplo, y asi con las demas categorias.
 
 
 // ============ FUNCIONES COMUNES DE USO ============
