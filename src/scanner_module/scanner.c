@@ -8,7 +8,7 @@
 #define MAX_AUTOMATA 10
 #define TOKEN_BUFFER_SIZE 256
 #define DEFAULT_TOKEN {0}
-#define AUTOMATA_FILE "../automatas_module/automatas.txt"
+
 
 
 // ============ VARIABLE GLOBAL: TODOS LOS AUTÓMATAS ============
@@ -50,10 +50,10 @@ int read_char(scanner_context_t* ctx) {
 
 // ============ INICIALIZACIÓN DE ESTADOS DE AUTÓMATAS ============
 
-void initialize_automaton_states(automaton_state_t* states, automaton** automata, int num_auto) {
+void initialize_automaton_states(automaton_state_t* states, automaton* automata, int num_auto) {
     for (int i = 0; i < num_auto; i++) {
-        states[i].automaton = automata[i];
-        states[i].current_state = automata[i]->initial_state;
+        states[i].automaton = &automata[i];
+        states[i].current_state = automata[i].initial_state;
         states[i].is_active = 1;
     }
 }
@@ -137,14 +137,14 @@ int find_accepting_automaton(automaton_state_t* states, int num_auto) {
 
 // ============ FUNCIÓN PRINCIPAL DEL SCANNER ============
 
-void StartScanner(FILE* InputFile, FILE* OutputFile) {
+void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
     if (!InputFile || !OutputFile) {
         fprintf(stderr, "[ERROR] Scanner: Invalid input or output file\n");
         return;
     }
 
     // Inicializar autómatas, num_automatas es una varaible de output.
-    all_automata = generate_automatas(AUTOMATA_FILE, &num_automata);
+    all_automata = generate_automatas(Automatafile, &num_automata);
     
     // Contexto del scanner
     scanner_context_t ctx = {
@@ -161,7 +161,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
     automaton_state_t lookahead_states[MAX_AUTOMATA];
     
     initialize_automaton_states(states, all_automata, num_automata);
-    initialize_automaton_states(lookahead_states, lookahead_automata, num_automata);
+    //initialize_automaton_states(lookahead_states, lookahead_automata, num_automata);
     
     char token_buffer[TOKEN_BUFFER_SIZE] = DEFAULT_TOKEN;
     int token_pos = 0;

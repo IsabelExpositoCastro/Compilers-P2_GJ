@@ -35,11 +35,11 @@ typedef struct {
 
 // --------------- FUNCTION PROTOTYPES ---------------
 void printCasual();
-void StartScanner(FILE* InputFile, FILE* OutputFile);
+void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Autfile);
 
 // Funciones internas del scanner
 int peek_char(scanner_context_t* ctx);
 int read_char(scanner_context_t* ctx);
 int can_any_automaton_continue(automaton_state_t* states, int num_automata, char next_char);
-void initialize_automaton_states(automaton_state_t* states, automaton** automata, int num_automata);
+void initialize_automaton_states(automaton_state_t* states, automaton* automata, int num_automata);
 void reset_automaton_states(automaton_state_t* states, int num_automata);
