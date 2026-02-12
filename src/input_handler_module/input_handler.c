@@ -47,7 +47,7 @@ FILE* Open_InputFile(int argc, char* argv[]) {
         FILE* inputFile = fopen(argv[1], "r");
         if (!inputFile) {
             fprintf(stderr, "[INPUT_HANDLER] Error: Could not open file %s\n", argv[1]);
-            return NULL;
+            return stdin;
         }
         return inputFile;
     }
@@ -80,14 +80,14 @@ FILE* Open_OutputFile(int argc, char* argv[]) {
     char* outname = build_output_name(argv[1]);
     if (!outname) {
         fprintf(stderr, "[INPUT_HANDLER] Error: malloc failed creating output name\n");
-        return NULL;
+        return stdout;
     }
 
     FILE* outputFile = fopen(outname, "w");
     if (!outputFile) {
         fprintf(stderr, "[INPUT_HANDLER] Error: Could not open output file %s\n", outname);
         free(outname);
-        return NULL;
+        return stdout;
     }
 
     free(outname);
