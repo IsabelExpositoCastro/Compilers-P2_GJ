@@ -6,7 +6,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-// OPCIÓN 2: Definición del autómata usando índices (OPCIÓN MÁS CLÁSICA Y SENCILLA DE IMPLEMENTAR, PERO MENOS LEGIBLE)
+#define CAT_NONRECOGNIZED -1 // Categoria reservada para tokens no reconocidos
+
+// Automata definition structure.
 typedef struct {
     char* alphabet;             // Alfabeto del autómata (conjunto de caracteres válidos)
     int alphabet_size;          // Tamaño del alfabeto
@@ -16,8 +18,9 @@ typedef struct {
     int* accepting_states;      // Índices de los estados de aceptación
     int num_accepting_states;   // Número de estados de aceptación
     int** transition_matrix;    // Matriz de transición: [estado][símbolo] = estado_destino
-    char* category_name; 
-    int category;       // Categoría del autómata (todos los tokens de este autómata = misma categoría)
+    char* category_name;        // Nombre de la categoría (ej: IDENTIFIER, KEYWORD, etc.)
+    int category;               // Categoría del autómata (todos los tokens de este autómata = misma categoría)
+    bool need_lookahead;        // Indica si el autómata requiere lookahead para decidir su aceptación
 } automaton;
 
 

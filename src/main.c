@@ -7,14 +7,11 @@
 
 // ------------------ MAIN FUNCTION ------------------
 int main(int argc, char *argv[]) {
+    //Llamada a argumentos, sera copiar pegar de la anteriror.
+    
+    //Pendiente de error message.
     FILE* ifile = Open_InputFile(argc, argv);
-    if (!ifile) return 1;
-
     FILE* ofile = Open_OutputFile(argc, argv);
-    if (!ofile) {
-        if (ifile != stdin) fclose(ifile);
-        return 1;
-    }
 
     StartScanner(ifile, ofile);
 

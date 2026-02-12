@@ -87,11 +87,11 @@ automaton* generate_automatas(FILE* file,int* num_automatas){
     automaton* automatas = malloc((*num_automatas) * sizeof(automaton));
     for (int k = 0; k < (*num_automatas); k++) {
         read_automatas(file, &automatas[k]);
-        automatas[k].category = k+1; //Category 0 is reserved to CAT_NONRECONIZED
+        automatas[k].category = k; //Category -1 is reserved to CAT_NONRECONIZED
     }
     return automatas;
 }
-
+// listautomatas[returnedvalue].category_name = "IDENTIFIER" por ejemplo, y asi con las demas categorias.
 /*
 Number of automatas: 1
 

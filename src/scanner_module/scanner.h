@@ -7,7 +7,7 @@
 
 // ============ ESTRUCTURA PARA ESTADO DE AUTÓMATA ============
 typedef struct {
-    automaton2_t* automaton;
+    automaton* automaton;
     int current_state;      // Estado actual en el autómata
     int is_active;          // ¿Sigue activo?
 } automaton_state_t;
@@ -15,9 +15,9 @@ typedef struct {
 
 // ============ ESTRUCTURA PARA CANDIDATO DE TOKEN ============
 typedef struct {
-    char buffer[256];
+    char buffer[256]; // <- Tremendo magic number.
     int length;
-    category_t category;
+    int category;
     int is_valid;
 } token_candidate_t;
 
@@ -41,5 +41,5 @@ void StartScanner(FILE* InputFile, FILE* OutputFile);
 int peek_char(scanner_context_t* ctx);
 int read_char(scanner_context_t* ctx);
 int can_any_automaton_continue(automaton_state_t* states, int num_automata, char next_char);
-void initialize_automaton_states(automaton_state_t* states, automaton2_t** automata, int num_automata);
+void initialize_automaton_states(automaton_state_t* states, automaton** automata, int num_automata);
 void reset_automaton_states(automaton_state_t* states, int num_automata);

@@ -1,6 +1,6 @@
 // --------------- LIBRARIES ---------------
 #include "scanner.h"
-#include "../automatas_module/special_characters.h"
+#include "../automatas_module/automatonDefinition.h"
 
 
 // --------------- DEFINITIONS ---------------
@@ -8,44 +8,15 @@
 #define MAX_AUTOMATA 10
 #define TOKEN_BUFFER_SIZE 256
 #define DEFAULT_TOKEN {0}
+#define AUTOMATA_FILE "../automatas_module/automatas.txt"
 
 
 // ============ VARIABLE GLOBAL: TODOS LOS AUTÓMATAS ============
-static automaton2_t* all_automata[MAX_AUTOMATA];
-static automaton2_t* lookahead_automata[MAX_AUTOMATA];
+static automaton* all_automata = NULL;
+static automaton* lookahead_automata[MAX_AUTOMATA]; // ?
 static int num_automata = 0;
 
 
-// ============ INICIALIZACIÓN DE AUTÓMATAS ============
-void initialize_all_automata() {
-    // Crear autómatas específicos
-    all_automata[0] = create_special_char_automaton();
-    lookahead_automata[0] = create_special_char_automaton();
-    // TODO: Agregar más autómatas (keywords, identifiers, numbers, etc.)
-    
-    num_automata = 1;  // Por ahora solo tenemos SPECIAL_CHARACTERS
-
-    //all_automata[1] = create_literal_automaton();
-    //lookahead_automata[1] = create_literal_automaton();
-    //num_automata++;
-
-    
-    printf("[SCANNER] Initialized %d automata\n", num_automata);
-}
-
-void free_all_automata() {
-    for (int i = 0; i < num_automata; i++) {
-        if (all_automata[i]) {
-            free_automaton(all_automata[i]);
-            all_automata[i] = NULL;
-        }
-        if (lookahead_automata[i]) {
-            free_automaton(lookahead_automata[i]);
-            lookahead_automata[i] = NULL;
-        }
-    }
-    num_automata = 0;
-}
 
 
 // ============ FUNCIONES DE MANEJO DE ENTRADA ============
@@ -79,7 +50,7 @@ int read_char(scanner_context_t* ctx) {
 
 // ============ INICIALIZACIÓN DE ESTADOS DE AUTÓMATAS ============
 
-void initialize_automaton_states(automaton_state_t* states, automaton2_t** automata, int num_auto) {
+void initialize_automaton_states(automaton_state_t* states, automaton** automata, int num_auto) {
     for (int i = 0; i < num_auto; i++) {
         states[i].automaton = automata[i];
         states[i].current_state = automata[i]->initial_state;
@@ -172,8 +143,8 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
         return;
     }
 
-    // Inicializar autómatas
-    initialize_all_automata();
+    // Inicializar autómatas, num_automatas es una varaible de output.
+    all_automata = generate_automatas(AUTOMATA_FILE, &num_automata);
     
     // Contexto del scanner
     scanner_context_t ctx = {
@@ -198,7 +169,9 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
     token_candidate_t last_valid = {
         .buffer = DEFAULT_TOKEN,
         .length = 0,
-        .category = CAT_NONRECOGNIZED,
+        .category = CAT_NONRECOGNIZED, 
+        // CAT_NONRECOGNIZED la he reservado como categoria -1 en automatonDefinition.c. 
+        //Las demas categrias empezaran por la categoria 0
         .is_valid = 1
     };
     int c;
@@ -272,10 +245,10 @@ void StartScanner(FILE* InputFile, FILE* OutputFile) {
             }
         }
     }
-    free_all_automata();
+    free_automatas(all_automata, num_automata);
 }
 
-
+/*
 // ============ FUNCIÓN DE PRUEBA ============
 void printCasual() {
     printf("=== SCANNER TEST ===\n");
@@ -309,4 +282,4 @@ void printCasual() {
         
         free_automaton(special);
     }
-}
+}*/
