@@ -20,8 +20,9 @@ typedef struct {
     int** transition_matrix;    // Matriz de transición: [estado][símbolo] = estado_destino
     char* category_name;        // Nombre de la categoría (ej: IDENTIFIER, KEYWORD, etc.)
     int category;               // Categoría del autómata (todos los tokens de este autómata = misma categoría)
-    bool need_lookahead;        // Indica si el autómata requiere lookahead para decidir su aceptación
+    int null_state;             // Indica el estado al que se transita si no hay una transición definida (estado de error)
 } automaton;
+// listautomatas[returnedvalue].category_name = "IDENTIFIER" por ejemplo, y asi con las demas categorias.
 
 
 // ============ FUNCIONES COMUNES DE USO ============

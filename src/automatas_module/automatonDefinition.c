@@ -34,46 +34,58 @@ void print_automaton_info(automaton* automaton, const char* name) {
         return;
     }
 
-    printf("\n[AUTOMATON] %s\n", name);
+    printf("\n+---- [AUTOMATON] %s ----+\n", name);
+
+    // Category
+    printf("| Category: %s (ID: %d)\n",
+           automaton->category_name ? automaton->category_name : "NULL",
+           automaton->category);
 
     // Alphabet
-    printf("  Alphabet: '%s' (size: %d)\n",
+    printf("| Alphabet: '%s' (size: %d)\n",
            automaton->alphabet ? automaton->alphabet : "NULL",
            automaton->alphabet_size);
 
     // States
-    printf("  States (%d): ", automaton->num_states);
+    printf("| States (%d): ", automaton->num_states);
     for (int i = 0; i < automaton->num_states; i++) {
-        printf("%d ", automaton->states[i]);
+        printf("%d", automaton->states[i]);
+        if (i < automaton->num_states - 1) printf(", ");
     }
     printf("\n");
 
-    // Initial
-    printf("  Initial state: %d\n", automaton->initial_state);
+    // Initial state
+    printf("| Initial state: %d\n", automaton->initial_state);
 
-    // Accepting
-    printf("  Accepting states (%d): ", automaton->num_accepting_states);
+    // Accepting states
+    printf("| Accepting states (%d): ", automaton->num_accepting_states);
     for (int i = 0; i < automaton->num_accepting_states; i++) {
-        printf("%d ", automaton->accepting_states[i]);
+        printf("%d", automaton->accepting_states[i]);
+        if (i < automaton->num_accepting_states - 1) printf(", ");
     }
     printf("\n");
 
-    // Category
-    printf("  Category ID: %d\n", automaton->category);
-    printf("  Category name: %s\n",
-           automaton->category_name ? automaton->category_name : "NULL");
+    // Null state
+    printf("| Null state (error): %d\n", automaton->null_state);
 
-    // Transition matrix
-    printf("  Transition matrix:\n");
+    // Transition matrix header
+    printf("| Transition Matrix:\n");
+    printf("|   ");
+    for (int j = 0; j < automaton->alphabet_size; j++) {
+        printf("%c ", automaton->alphabet[j]);
+    }
+    printf("\n");
+
+    // Transition matrix data
     for (int i = 0; i < automaton->num_states; i++) {
-        printf("    ");
+        printf("| %d:", automaton->states[i]);
         for (int j = 0; j < automaton->alphabet_size; j++) {
-            printf("%d ", automaton->transition_matrix[i][j]);
+            printf(" %d", automaton->transition_matrix[i][j]);
         }
         printf("\n");
     }
 
-    printf("\n");
+    printf("+----------------------------------------------------+\n");
 }
 
 
@@ -100,13 +112,14 @@ num_states: 3
 states: 0 1 2
 initial: 0
 num_accepting_states: 1
-accepting states: 2
+accepting states: 1
 category: CAT_CATEGORY
 transitions: states x symbols
         a b c
 state0: 1 2 0
 state1: 2 0 1
 state2: 0 1 2
+null state: 2
 */
 void read_automatas(FILE* file, automaton* a) {
     char line[MAX_LINE];
@@ -182,6 +195,10 @@ void read_automatas(FILE* file, automaton* a) {
             }
         }
     }
+    
+    // ---------- NULL STATE ----------
+    fgets(line, MAX_LINE, file);
+    sscanf(line, "%d", &a->null_state);
 }
 
 
