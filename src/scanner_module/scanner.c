@@ -1,6 +1,8 @@
 // --------------- LIBRARIES ---------------
 #include "scanner.h"
 #include "../automatas_module/automatonDefinition.h"
+#include "../counter_module/counter.h"
+#include "../preprocesor_variables.h"
 
 
 // --------------- DEFINITIONS ---------------
@@ -22,28 +24,34 @@ static int num_automata = 0;
 // ============ FUNCIONES DE MANEJO DE ENTRADA ============
 
 int peek_char(scanner_context_t* ctx) {
-    if (ctx->lookahead_char == -2) {  // No leído aún
+    if (ctx->lookahead_char == -2) {  // 1 comparación
+        COUNT_COMP();
         ctx->lookahead_char = fgetc(ctx->input_file);
+        COUNT_IO(1);  // Lectura de 1 carácter
     }
     return ctx->lookahead_char;
 }
 
 int read_char(scanner_context_t* ctx) {
     int c;
-    if (ctx->lookahead_char != -2) {  // Ya hay lookahead
+    if (ctx->lookahead_char != -2) {  // 1 comparación
+        COUNT_COMP();
         c = ctx->lookahead_char;
         ctx->lookahead_char = -2;
     } else {
         c = fgetc(ctx->input_file);
+        COUNT_IO(1);  // Lectura de 1 carácter
     }
     
-    if (c == '\n') {
+    if (c == '\n') {  // 1 comparación
+        COUNT_COMP();
         ctx->line_num++;
         ctx->col_num = 0;
-    } else if (c != EOF) {
+    } else if (c != EOF) {  // 1 comparación
+        COUNT_COMP();
         ctx->col_num++;
     }
-    
+    COUNT_GEN();  // Operación general
     return c;
 }
 
@@ -70,18 +78,27 @@ void reset_automaton_states(automaton_state_t* states, int num_auto) {
 
 int can_any_automaton_continue(automaton_state_t* states, int num_auto, char next_char) {
     for (int i = 0; i < num_auto; i++) {
-        if (!states[i].is_active) continue;
+        COUNT_COMP();  // Comparación en loop
+        if (!states[i].is_active) {
+            COUNT_COMP();
+            continue;
+        }
         
         // Buscar índice del símbolo
         int symbol_idx = find_symbol_index(states[i].automaton, next_char);
         if (symbol_idx == -1) {
+            COUNT_COMP();  // Comparación de resultado
             // Símbolo no en alfabeto
             continue;
         }
         
+        COUNT_COMP();  // Comparación de resultado
         // Intentar transición
         int next_state = states[i].automaton->transition_matrix[states[i].current_state][symbol_idx];
+        COUNT_GEN();  // Acceso a matriz
+        
         if (next_state != -1) {
+            COUNT_COMP();  // Comparación
             // Transición válida
             return 1;
         }
@@ -96,28 +113,40 @@ void process_automata_transition(automaton_state_t* states, int num_auto, char c
     int any_active = 0;
     
     for (int i = 0; i < num_auto; i++) {
-        if (!states[i].is_active) continue;
-        
-        // Buscar símbolo en alfabeto
-        int symbol_idx = find_symbol_index(states[i].automaton, c);
-        
-        if (symbol_idx == -1) {
-            // Símbolo NO en alfabeto → muere
-            states[i].is_active = 0;
+        COUNT_COMP();  // Comparación en loop
+        if (!states[i].is_active) {
+            COUNT_COMP();
             continue;
         }
         
+        // Buscar símbolo en alfabeto
+        int symbol_idx = find_symbol_index(states[i].automaton, c);
+        COUNT_GEN();  // Búsqueda
+        
+        if (symbol_idx == -1) {
+            COUNT_COMP();  // Comparación
+            // Símbolo NO en alfabeto → muere
+            states[i].is_active = 0;
+            COUNT_GEN();
+            continue;
+        }
+        
+        COUNT_COMP();  // Comparación
         // Intentar transición
         int next_state = states[i].automaton->transition_matrix[states[i].current_state][symbol_idx];
+        COUNT_GEN();  // Acceso a matriz
         
         if (next_state == -1) {
+            COUNT_COMP();  // Comparación
             // Transición inválida → muere
             states[i].is_active = 0;
+            COUNT_GEN();
             continue;
         }
         
         // Transición válida
         states[i].current_state = next_state;
+        COUNT_GEN();  // Asignación
         any_active = 1;
     }
 }
@@ -127,7 +156,9 @@ void process_automata_transition(automaton_state_t* states, int num_auto, char c
 
 int find_accepting_automaton(automaton_state_t* states, int num_auto) {
     for (int i = 0; i < num_auto; i++) {
+        COUNT_COMP();  // Comparación en loop
         if (states[i].is_active && is_accepting_state(states[i].automaton, states[i].current_state)) {
+            COUNT_COMP();  // Comparación adicional
             return i;
         }
     }
@@ -245,6 +276,10 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
             }
         }
     }
+    
+    // Escribir contadores al archivo de debug
+    write_counters(OutputFile, "scanner_output");
+    
     free_automatas(all_automata, num_automata);
 }
 

@@ -2,6 +2,7 @@
 #include "./main.h"
 #include "scanner_module/scanner.h"
 #include "input_handler_module/input_handler.h"
+#include "counter_module/counter.h"
 #define AUTOMATA_FILE "../automatas_module/automatas.txt"
 
 
