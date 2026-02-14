@@ -25,9 +25,9 @@ static int num_automata = 0;
 
 int peek_char(scanner_context_t* ctx) {
     if (ctx->lookahead_char == -2) {  // 1 comparación
-        COUNT_COMP();
+        COUNT_COMP_N(1);
         ctx->lookahead_char = fgetc(ctx->input_file);
-        COUNT_IO(1);  // Lectura de 1 carácter
+        COUNT_IO_N(1);  // Lectura de 1 carácter
     }
     return ctx->lookahead_char;
 }
@@ -35,23 +35,23 @@ int peek_char(scanner_context_t* ctx) {
 int read_char(scanner_context_t* ctx) {
     int c;
     if (ctx->lookahead_char != -2) {  // 1 comparación
-        COUNT_COMP();
+        COUNT_COMP_N(1);
         c = ctx->lookahead_char;
         ctx->lookahead_char = -2;
     } else {
         c = fgetc(ctx->input_file);
-        COUNT_IO(1);  // Lectura de 1 carácter
+        COUNT_IO_N(1);  // Lectura de 1 carácter
     }
     
     if (c == '\n') {  // 1 comparación
-        COUNT_COMP();
+        COUNT_COMP_N(1);
         ctx->line_num++;
         ctx->col_num = 0;
     } else if (c != EOF) {  // 1 comparación
-        COUNT_COMP();
+        COUNT_COMP_N(1);
         ctx->col_num++;
     }
-    COUNT_GEN();  // Operación general
+    COUNT_GEN_N(1);  // Operación general
     return c;
 }
 
@@ -60,14 +60,19 @@ int read_char(scanner_context_t* ctx) {
 
 void initialize_automaton_states(automaton_state_t* states, automaton* automata, int num_auto) {
     for (int i = 0; i < num_auto; i++) {
+        COUNT_COMP_N(1);
         states[i].automaton = &automata[i];
+        COUNT_GEN_N(1);
         states[i].current_state = automata[i].initial_state;
+        COUNT_GEN_N(1);
         states[i].is_active = 1;
+        COUNT_GEN_N(1);
     }
 }
 
 void reset_automaton_states(automaton_state_t* states, int num_auto) {
     for (int i = 0; i < num_auto; i++) {
+        COUNT_COMP_N(1);
         states[i].current_state = states[i].automaton->initial_state;
         states[i].is_active = 1;
     }
@@ -78,27 +83,27 @@ void reset_automaton_states(automaton_state_t* states, int num_auto) {
 
 int can_any_automaton_continue(automaton_state_t* states, int num_auto, char next_char) {
     for (int i = 0; i < num_auto; i++) {
-        COUNT_COMP();  // Comparación en loop
+        COUNT_COMP_N(1);  // Comparación en loop
         if (!states[i].is_active) {
-            COUNT_COMP();
+            COUNT_COMP_N(1);
             continue;
         }
         
         // Buscar índice del símbolo
         int symbol_idx = find_symbol_index(states[i].automaton, next_char);
         if (symbol_idx == -1) {
-            COUNT_COMP();  // Comparación de resultado
+            COUNT_COMP_N(1);  // Comparación de resultado
             // Símbolo no en alfabeto
             continue;
         }
         
-        COUNT_COMP();  // Comparación de resultado
+        COUNT_COMP_N(1);  // Comparación de resultado
         // Intentar transición
         int next_state = states[i].automaton->transition_matrix[states[i].current_state][symbol_idx];
-        COUNT_GEN();  // Acceso a matriz
+        COUNT_GEN_N(1);  // Acceso a matriz
         
         if (next_state != -1) {
-            COUNT_COMP();  // Comparación
+            COUNT_COMP_N(1);  // Comparación
             // Transición válida
             return 1;
         }
@@ -113,40 +118,40 @@ void process_automata_transition(automaton_state_t* states, int num_auto, char c
     int any_active = 0;
     
     for (int i = 0; i < num_auto; i++) {
-        COUNT_COMP();  // Comparación en loop
+        COUNT_COMP_N(1);  // Comparación en loop
         if (!states[i].is_active) {
-            COUNT_COMP();
+            COUNT_COMP_N(1);
             continue;
         }
         
         // Buscar símbolo en alfabeto
         int symbol_idx = find_symbol_index(states[i].automaton, c);
-        COUNT_GEN();  // Búsqueda
+        COUNT_GEN_N(1);  // Búsqueda
         
         if (symbol_idx == -1) {
-            COUNT_COMP();  // Comparación
+            COUNT_COMP_N(1);  // Comparación
             // Símbolo NO en alfabeto → muere
             states[i].is_active = 0;
-            COUNT_GEN();
+            COUNT_GEN_N(1);
             continue;
         }
         
-        COUNT_COMP();  // Comparación
+        COUNT_COMP_N(1);  // Comparación
         // Intentar transición
         int next_state = states[i].automaton->transition_matrix[states[i].current_state][symbol_idx];
-        COUNT_GEN();  // Acceso a matriz
+        COUNT_GEN_N(1);  // Acceso a matriz
         
         if (next_state == -1) {
-            COUNT_COMP();  // Comparación
+            COUNT_COMP_N(1);  // Comparación
             // Transición inválida → muere
             states[i].is_active = 0;
-            COUNT_GEN();
+            COUNT_GEN_N(1);
             continue;
         }
         
         // Transición válida
         states[i].current_state = next_state;
-        COUNT_GEN();  // Asignación
+        COUNT_GEN_N(1);  // Asignación
         any_active = 1;
     }
 }
@@ -156,9 +161,9 @@ void process_automata_transition(automaton_state_t* states, int num_auto, char c
 
 int find_accepting_automaton(automaton_state_t* states, int num_auto) {
     for (int i = 0; i < num_auto; i++) {
-        COUNT_COMP();  // Comparación en loop
+        COUNT_COMP_N(1);  // Comparación en loop
         if (states[i].is_active && is_accepting_state(states[i].automaton, states[i].current_state)) {
-            COUNT_COMP();  // Comparación adicional
+            COUNT_COMP_N(1);  // Comparación adicional
             return i;
         }
     }
@@ -208,13 +213,20 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
     int c;
 
     while ((c = read_char(&ctx)) != EOF) {
+        COUNT_COMP_N(1);
         if (c == ' ' || c == '\t' || c == '\n') {
+            COUNT_COMP_N(1);
             if(last_valid.length > 0) {
+                COUNT_COMP_N(1);
                 fprintf(OutputFile, "<%s, %d> ", token_buffer, last_valid.category);
+                COUNT_IO_N(strlen(token_buffer));
             }
             for (int i = 0; i < last_valid.length; i++) {
+                COUNT_COMP_N(1);
                 token_buffer[i] = '\0';
+                COUNT_GEN_N(1);
                 last_valid.buffer[i] = '\0';
+                COUNT_GEN_N(1);
             }
             token_pos = 0;
             last_valid.length = 0;
@@ -222,20 +234,29 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
             last_valid.is_valid = 0;
             reset_automaton_states(states, num_automata);
             if (c == '\n') {
+                COUNT_COMP_N(1);
                 fprintf(OutputFile, "\n");
                 ctx.line_num++;
+                COUNT_IO_N(1); 
             }
         }else {
             int next_char = peek_char(&ctx);
 
             if(can_any_automaton_continue(states, num_automata, c)) {
+                COUNT_COMP_N(1);
                 if(!last_valid.is_valid){
+                    COUNT_COMP_N(1);
                     if(last_valid.length > 1) {
-                        fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+                        COUNT_COMP_N(1);
+                        int written = fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+                        COUNT_IO_N(written);
                     }
                     for (int i = 0; i < last_valid.length; i++) {
+                        COUNT_COMP_N(1);
                         token_buffer[i] = '\0';
+                        COUNT_GEN_N(1);
                         last_valid.buffer[i] = '\0';
+                        COUNT_GEN_N(1);
                     }
                     token_pos = 0;
                     last_valid.length = 0;
@@ -250,12 +271,16 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
                 last_valid.is_valid = 1;
                 int accepting_idx = find_accepting_automaton(states, num_automata);
                 if (accepting_idx != -1) {
+                    COUNT_COMP_N(1);
                     strncpy(last_valid.buffer, token_buffer, token_pos);
+                    COUNT_GEN_N(1);
                     last_valid.buffer[token_pos] = '\0';
                     last_valid.category = states[accepting_idx].automaton->category;
                     last_valid.is_valid = 1;
                     fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+                    COUNT_IO_N(strlen(last_valid.buffer));
                     for (int i = 0; i < last_valid.length; i++) {
+                        COUNT_COMP_N(1);
                         token_buffer[i] = '\0';
                         last_valid.buffer[i] = '\0';
                     }
@@ -277,8 +302,8 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
         }
     }
     
-    // Escribir contadores al archivo de debug
-    write_counters(OutputFile, "scanner_output");
+    // Escribir contadores con detalles por función
+    write_counters(OutputFile, "input_file.c");
     
     free_automatas(all_automata, num_automata);
 }
