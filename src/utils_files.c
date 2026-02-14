@@ -20,9 +20,14 @@ void split_path(const char *fullpath, char *path, char *filename, char *extensio
         strcpy(filename, fullpath);
     }
 
-    if (last_dot && last_dot > last_slash) {
+    if (last_dot) {
         strcpy(extension, last_dot + 1);
-        filename[last_dot - last_slash - 1] = '\0';  // remove extension from filename
+        /* remove extension from filename: compute index relative to filename start */
+        const char *name_start = (last_slash ? last_slash + 1 : fullpath);
+        if (last_dot > name_start) {
+            size_t name_len = (size_t)(last_dot - name_start);
+            filename[name_len] = '\0';
+        }
     } else {
         extension[0] = '\0';
     }
@@ -35,7 +40,7 @@ void generate_timestamped_log_filename(const char* base_name, char* output, size
 
     split_path(base_name, path, filename, extension);
 
-    if(extension == NULL || strlen(extension) == 0) {
+    if (extension[0] == '\0') {
         snprintf(extension, sizeof(extension), "log"); // Default extension if none provided
     }
 
@@ -50,7 +55,7 @@ void generate_timestamped_log_filename(const char* base_name, char* output, size
              filename,
              extension);
 
-    fprintf(ofile, "Generated log filename (with time stamp): %s\n", output);
+    if (ofile) fprintf(ofile, "Generated log filename (with time stamp): %s\n", output);
 
 }
 
@@ -95,8 +100,33 @@ FILE* set_output_test_file(const char* filename) {
 
 
 void call_print_counts() {
-    // TODO: Implementar funciones de conteo
-    // if (COUNT_CONFIG_FLAG) {
-    //     FILE* opens = fopen(OUTPUT_COUNT_FILE, "a");
-    // }
+    /* Print counters according to build-time configuration.
+       If `COUNTCONFIG` is defined then counters exist. If `COUNTOUT` == 1
+       counters are printed to the main `ofile`, otherwise they are appended
+       to a separate counts file under PATHDIRLOGS. */
+#ifdef COUNTCONFIG
+    if (ofile == NULL) {
+        /* Fall back to stdout */
+        counters_print(stdout);
+        return;
+    }
+
+#if defined(COUNTOUT) && (COUNTOUT == 1)
+    counters_print(ofile);
+#else
+    char counts_filename[MAXFILENAME];
+    snprintf(counts_filename, sizeof(counts_filename), "%scounters.log", PATHDIRLOGS);
+    FILE* cf = fopen(counts_filename, "a");
+    if (cf) {
+        counters_print(cf);
+        fclose(cf);
+        fprintf(ofile, "Appended counters to %s\n", counts_filename);
+    } else {
+        fprintf(ofile, "Could not open %s for counters; printing to main output instead\n", counts_filename);
+        counters_print(ofile);
+    }
+#endif
+#else
+    /* Counters disabled at compile time; no-op */
+#endif
 }
