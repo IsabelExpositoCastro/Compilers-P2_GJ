@@ -1,22 +1,53 @@
-#ifndef COUNTER_H
-#define COUNTER_H
-
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "../automatas_module/automatonDefinition.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-// Initialize counters. `max_categories` should be the number of automata/categories
-// available. An extra slot is reserved for non-recognized tokens.
-void counters_init(int max_categories, FILE* out);
+#define MAX_FUNCTIONS 50
+#define MAX_ENTRIES 1000
+#define MAX_COUNTER_TYPE 10
+#define MAX_FILENAME 256
+#define MAX_FUNCTION_NAME 128
+typedef struct {
+    char function_name[MAX_FUNCTION_NAME];
+    int count_comp; 
+    int count_io;
+    int count_gen;
+} counters;
 
-// Increment counter for given category (use CAT_NONRECOGNIZED for unknowns)
-void counters_inc(int category);
+typedef struct {
+    char function_name[MAX_FUNCTION_NAME];
+    int input_line;
+    char counter_type[MAX_COUNTER_TYPE];  // "COMP", "IO", "GEN"
+    int amount;
+    int partial_comp;
+    int partial_io;
+    int partial_gen;
+    int total_comp;
+    int total_io;
+    int total_gen;
+} counter_entry;
 
-// Print counters summary to `out` (if NULL prints to stdout)
-void counters_print(FILE* out);
 
-// Free internal data structures
-void counters_free();
 
-#endif // COUNTER_H
+// Funciones para incrementar contadores con tracking detallado
+void add_counter_comp_detailed(const char* function_name, int input_line, int amount);
+void add_counter_io_detailed(const char* function_name, int input_line, int amount);
+void add_counter_gen_detailed(const char* function_name, int input_line, int amount);
+
+
+
+// Función para obtener los valores de los contadores
+counters get_counters();
+
+// Función para rastrear contexto actual (línea de entrada procesada)
+//void set_counter_context(const char* function_name, int input_line_number);
+
+// Función auxiliar para construir el nombre del archivo debug
+static char* build_count_filename(const char* input_filename); 
+
+static void register_entry(const char* function_name, int input_line, const char* counter_type, int amount);
+ 
+// Función para escribir los contadores
+// output_file: archivo del scanner (usado si COUNTOUT==1)
+// input_filename: nombre del archivo de entrada (para generar <filename>.<ext>dbgcnt si COUNTOUT==0)
+void write_counters(FILE* output_file, const char* input_filename);

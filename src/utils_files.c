@@ -98,35 +98,3 @@ FILE* set_output_test_file(const char* filename) {
     return ofile;
 }
 
-
-void call_print_counts() {
-    /* Print counters according to build-time configuration.
-       If `COUNTCONFIG` is defined then counters exist. If `COUNTOUT` == 1
-       counters are printed to the main `ofile`, otherwise they are appended
-       to a separate counts file under PATHDIRLOGS. */
-#ifdef COUNTCONFIG
-    if (ofile == NULL) {
-        /* Fall back to stdout */
-        counters_print(stdout);
-        return;
-    }
-
-#if defined(COUNTOUT) && (COUNTOUT == 1)
-    counters_print(ofile);
-#else
-    char counts_filename[MAXFILENAME];
-    snprintf(counts_filename, sizeof(counts_filename), "%scounters.log", PATHDIRLOGS);
-    FILE* cf = fopen(counts_filename, "a");
-    if (cf) {
-        counters_print(cf);
-        fclose(cf);
-        fprintf(ofile, "Appended counters to %s\n", counts_filename);
-    } else {
-        fprintf(ofile, "Could not open %s for counters; printing to main output instead\n", counts_filename);
-        counters_print(ofile);
-    }
-#endif
-#else
-    /* Counters disabled at compile time; no-op */
-#endif
-}
