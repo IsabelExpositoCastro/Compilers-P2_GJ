@@ -26,10 +26,8 @@
  *       input handler is responsible for creating the output file.
  *     - Memory allocated for the output filename is released internally.
  *
- * Status:
- *     Implemented and functional.
  *
- * Author: [Isabel Expósito ]
+ * Author: Isabel Expósito 
  *
  * -----------------------------------------------------------------------------
  */

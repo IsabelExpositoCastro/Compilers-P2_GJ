@@ -1,6 +1,7 @@
 // --------------- LIBRARIES ---------------
 #include "scanner.h"
 #include "../automatas_module/automatonDefinition.h"
+#include "../counter_module/counter.h"
 
 
 // --------------- DEFINITIONS ---------------
@@ -145,6 +146,8 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
 
     // Inicializar autómatas, num_automatas es una varaible de output.
     all_automata = generate_automatas(Automatafile, &num_automata);
+    // Initialize counters for categories (one slot per automaton/category)
+    counters_init(num_automata, OutputFile);
     
     // Contexto del scanner
     scanner_context_t ctx = {
@@ -180,6 +183,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
         if (c == ' ' || c == '\t' || c == '\n') {
             if(last_valid.length > 0) {
                 fprintf(OutputFile, "<%s, %d> ", token_buffer, last_valid.category);
+                counters_inc(last_valid.category);
             }
             for (int i = 0; i < last_valid.length; i++) {
                 token_buffer[i] = '\0';
@@ -224,6 +228,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
                     last_valid.category = states[accepting_idx].automaton->category;
                     last_valid.is_valid = 1;
                     fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+                    counters_inc(last_valid.category);
                     for (int i = 0; i < last_valid.length; i++) {
                         token_buffer[i] = '\0';
                         last_valid.buffer[i] = '\0';
@@ -245,6 +250,9 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
             }
         }
     }
+    // Print counters summary and free resources
+    counters_print(OutputFile);
+    counters_free();
     free_automatas(all_automata, num_automata);
 }
 
