@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define MAX_LINE 256
+#define NO_NULL_STATE -1
 
 // ============ FUNCIONES COMUNES DE USO ============
 
@@ -176,14 +177,12 @@ void read_automatas(FILE* file, automaton* a) {
     a->category_name = malloc(strlen(cat) + 1);
     strcpy(a->category_name, cat);
 
-    // ---------- TRANSITIONS ---------
-    // Reservar matriz
+    // ---------- TRANSITIONS ----------
     a->transition_matrix = malloc(a->num_states * sizeof(int*));
     for (int i = 0; i < a->num_states; i++) {
         a->transition_matrix[i] = malloc(a->alphabet_size * sizeof(int));
     }
 
-    // Leer filas
     for (int i = 0; i < a->num_states; i++) {
         fgets(line, MAX_LINE, file);
         token = strtok(line, " \n");
@@ -198,7 +197,11 @@ void read_automatas(FILE* file, automaton* a) {
     
     // ---------- NULL STATE ----------
     fgets(line, MAX_LINE, file);
-    sscanf(line, "%d", &a->null_state);
+    if (strcmp(line, "null\n") == 0) {
+        a->null_state = NO_NULL_STATE; // If it is the case that there is no null state.
+    } else {
+        sscanf(line, "%d", &a->null_state);
+    }
 }
 
 
