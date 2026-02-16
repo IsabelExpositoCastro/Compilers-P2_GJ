@@ -7,7 +7,7 @@
 // --------------- DEFINITIONS ---------------
 #define CHAR_NULL '\0'
 #define MAX_AUTOMATA 10
-#define TOKEN_BUFFER_SIZE 256
+#define TOKEN_BUFFER_SIZE 2560
 #define DEFAULT_TOKEN {0}
 #define UNREC "CAT_UNRECOGNIZED"
 
@@ -170,31 +170,32 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
     int category;
     char* category_name;
     int next_char;
+    int counter = 0;
 
     while ((c = read_char(&ctx)) != EOF) {
         if (c == '\n') {
-            if(token_pos > 0) {
-                printf("%s", token_buffer);
-                fprintf(OutputFile, "\n");
-                ctx.line_num++;
-            }
+            fprintf(OutputFile, "\n");
+            ctx.line_num++;
+
             reset_automaton_states(states, num_automata);
             for (int i = 0; i < token_pos; i++)
             {token_buffer[i] = '\0';}
             token_pos = 0;
+            counter++;
         }else{
             int alivedfm = process_automata_transition(states, num_automata, c);
             token_buffer[token_pos] = c;
             token_pos++;
-            printf("\n%c, %i alivedfm", c, alivedfm);
+            //printf("\n%i,%s  %c, %i",counter, token_buffer, c, alivedfm);
             if (alivedfm != 0)
             {
                 int alivekw = find_accepting_automaton(states, num_automata);
-                printf("\n%c, %i, %i alivedfm", c, alivedfm, alivekw);
+                //printf("\n%i,  %c, %i, %i",counter, c, alivedfm, alivekw);
                 if (alivekw != -1){
                     next_char = peek_char(&ctx);
                     int alivedfmwithla = can_any_automaton_continue(states, num_automata, next_char);
-                    if(alivedfmwithla != 0){
+                    if(alivedfmwithla != 0 && all_automata[alivedfmwithla].null_state == -1 && next_char !=EOF){
+                        //printf("\n%i,  %c, %i, %i, %i",counter, c, alivedfm, alivekw, alivedfmwithla);
                         continue;
                     }else{
                         fprintf(OutputFile, "<%s, %s> ", token_buffer, states[alivekw].automaton->category_name );
@@ -218,6 +219,13 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
                 reset_automaton_states(states, num_automata);
             }
         }
+        // printf("%i, ", counter);
+        // for (int i = 0; i < TOKEN_BUFFER_SIZE; i++)
+        // {
+        //     printf("%c", token_buffer[i]);
+        // }
+        // printf(" %i \n",token_pos);
+        // counter++;
     }
     free_automatas(all_automata, num_automata);
 }
