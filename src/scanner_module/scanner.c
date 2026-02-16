@@ -166,12 +166,21 @@ int process_automata_transition(automaton_state_t* states, int num_auto, char c)
 // ============ BÚSQUEDA DE AUTÓMATA ACEPTOR ============
 
 int find_accepting_automaton(automaton_state_t* states, int num_auto) {
+    int best_index = INVALID_AUTOMATON_INDEX;
+    int best_alphabet_size = 0;
+
     for (int i = 0; i < num_auto; i++) {
-        if (states[i].is_active && is_accepting_state(states[i].automaton, states[i].current_state)) {
-            return i;
+        if (!states[i].is_active) continue;
+        if (!is_accepting_state(states[i].automaton, states[i].current_state)) continue;
+
+        int current_alphabet_size = states[i].automaton->alphabet_size;
+        if (best_index == INVALID_AUTOMATON_INDEX || current_alphabet_size < best_alphabet_size) {
+            best_index = i;
+            best_alphabet_size = current_alphabet_size;
         }
     }
-    return INVALID_AUTOMATON_INDEX;  // Ninguno
+
+    return best_index;  // Ninguno si sigue en INVALID_AUTOMATON_INDEX
 }
 
 
