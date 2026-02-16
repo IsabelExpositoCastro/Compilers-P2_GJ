@@ -9,7 +9,7 @@
 #define MAX_AUTOMATA 10
 #define TOKEN_BUFFER_SIZE 256
 #define DEFAULT_TOKEN {0}
-
+#define UNREC "CAT_UNRECOGNIZED"
 
 
 // ============ VARIABLE GLOBAL: TODOS LOS AUTÓMATAS ============
@@ -93,7 +93,7 @@ int can_any_automaton_continue(automaton_state_t* states, int num_auto, char nex
 
 // ============ PROCESAMIENTO DE TRANSICIONES ============
 
-void process_automata_transition(automaton_state_t* states, int num_auto, char c) {
+int process_automata_transition(automaton_state_t* states, int num_auto, char c) {
     int any_active = 0;
     
     for (int i = 0; i < num_auto; i++) {
@@ -121,6 +121,7 @@ void process_automata_transition(automaton_state_t* states, int num_auto, char c
         states[i].current_state = next_state;
         any_active = 1;
     }
+    return any_active;
 }
 
 
@@ -138,16 +139,14 @@ int find_accepting_automaton(automaton_state_t* states, int num_auto) {
 
 // ============ FUNCIÓN PRINCIPAL DEL SCANNER ============
 
-void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* input_filename) {
-    if (!InputFile || !OutputFile) {
+void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
+    if (!InputFile || !OutputFile || !Automatafile) {
         fprintf(stderr, "[ERROR] Scanner: Invalid input or output file\n");
+
         return;
     }
-
-    // Inicializar autómatas, num_automatas es una varaible de output.
     all_automata = generate_automatas(Automatafile, &num_automata);
-    // Initialize counters for categories (one slot per automaton/category)
-    
+
     // Contexto del scanner
     scanner_context_t ctx = {
         .input_file = InputFile,
@@ -158,97 +157,58 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
         .col_num = 0
     };
 
-    // Estados de autómatas
     automaton_state_t states[MAX_AUTOMATA];
-    automaton_state_t lookahead_states[MAX_AUTOMATA];
-    
+
     initialize_automaton_states(states, all_automata, num_automata);
-    //initialize_automaton_states(lookahead_states, lookahead_automata, num_automata);
+    fprintf(stdout, "[num auto %d]\n", num_automata);
     
     char token_buffer[TOKEN_BUFFER_SIZE] = DEFAULT_TOKEN;
     int token_pos = 0;
-    
-    token_candidate_t last_valid = {
-        .buffer = DEFAULT_TOKEN,
-        .length = 0,
-        .category = CAT_NONRECOGNIZED, 
-        // CAT_NONRECOGNIZED la he reservado como categoria -1 en automatonDefinition.c. 
-        //Las demas categrias empezaran por la categoria 0
-        .is_valid = 1
-    };
     int c;
+    int category;
+    char* category_name;
+    int next_char;
 
     while ((c = read_char(&ctx)) != EOF) {
-        if (c == ' ' || c == '\t' || c == '\n') {
-            if(last_valid.length > 0) {
-                fprintf(OutputFile, "<%s, %d> ", token_buffer, last_valid.category);
-            }
-            for (int i = 0; i < last_valid.length; i++) {
-                token_buffer[i] = '\0';
-                last_valid.buffer[i] = '\0';
-            }
-            token_pos = 0;
-            last_valid.length = 0;
-            last_valid.category = CAT_NONRECOGNIZED;
-            last_valid.is_valid = 0;
-            reset_automaton_states(states, num_automata);
-            if (c == '\n') {
+        if (c == '\n') {
+            if(token_pos > 0) {
+                printf("%s", token_buffer);
                 fprintf(OutputFile, "\n");
                 ctx.line_num++;
             }
-        }else {
-            int next_char = peek_char(&ctx);
-
-            if(can_any_automaton_continue(states, num_automata, c)) {
-                if(!last_valid.is_valid){
-                    if(last_valid.length > 1) {
-                        fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
+            reset_automaton_states(states, num_automata);
+            for (int i = 0; i < token_pos; i++)
+            {token_buffer[i] = '\0';}
+            token_pos = 0;
+        }else{
+            int alivedfm = process_automata_transition(states, num_automata, c);
+            token_buffer[token_pos] = c;
+            token_pos++;
+            if (alivedfm != 0)
+            {
+                int alivekw = find_accepting_automaton(states, num_automata);
+                if (alivekw != -1){
+                    next_char = peek_char(&ctx);
+                    int alivedfmwithla = can_any_automaton_continue(states, num_automata, next_char);
+                    if(alivedfmwithla != 0){
+                        continue;
+                    }else{
+                        fprintf(OutputFile, "<%s, %s> ", token_buffer, states[alivekw].automaton->category_name );
+                        for (int i = 0; i < token_pos; i++)
+                        {token_buffer[i] = '\0';}
+                        token_pos = 0;
+                        reset_automaton_states(states, num_automata);
                     }
-                    for (int i = 0; i < last_valid.length; i++) {
-                        token_buffer[i] = '\0';
-                        last_valid.buffer[i] = '\0';
-                    }
-                    token_pos = 0;
-                    last_valid.length = 0;
-                    last_valid.category = CAT_NONRECOGNIZED;
-                    last_valid.is_valid = 0;
                 }
-                process_automata_transition(states, num_automata, (char)c);
-                token_buffer[token_pos] = (char)c;
-                token_pos++;
-                last_valid.buffer[token_pos] = '\0';
-                last_valid.length = token_pos;
-                last_valid.is_valid = 1;
-                int accepting_idx = find_accepting_automaton(states, num_automata);
-                if (accepting_idx != -1) {
-                    strncpy(last_valid.buffer, token_buffer, token_pos);
-                    last_valid.buffer[token_pos] = '\0';
-                    last_valid.category = states[accepting_idx].automaton->category;
-                    last_valid.is_valid = 1;
-                    fprintf(OutputFile, "<%s, %d> ", last_valid.buffer, last_valid.category);
-                    for (int i = 0; i < last_valid.length; i++) {
-                        token_buffer[i] = '\0';
-                        last_valid.buffer[i] = '\0';
-                    }
-                    token_pos = 0;
-                    last_valid.length = 0;
-                    last_valid.category = CAT_NONRECOGNIZED;
-                    last_valid.is_valid = 0;
-                    reset_automaton_states(states, num_automata);
-                }
-            }else{ //aqui ampliar
-                token_buffer[token_pos] = c;
-                token_pos++;
-                last_valid.buffer[token_pos] = '\0';
-                last_valid.length = token_pos;
-                last_valid.category = CAT_NONRECOGNIZED;
-                last_valid.is_valid = 0;
-                //if(can_any_automaton_continue(lookahead_automata, num_automata, next_char));
+            }else{
+                fprintf(OutputFile, "<%s, %s> ", token_buffer, UNREC);
+                for (int i = 0; i < token_pos; i++)
+                {token_buffer[i] = '\0';}
+                token_pos = 0;
+                reset_automaton_states(states, num_automata);
             }
         }
     }
-    // Print counters summary and free resources
-    write_counters(OutputFile, input_filename); // Assuming we want to write to the same output file
     free_automatas(all_automata, num_automata);
 }
 

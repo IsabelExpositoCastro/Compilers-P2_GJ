@@ -10,8 +10,10 @@ int main(int argc, char *argv[]) {
     //Llamada a argumentos, sera copiar pegar de la anteriror.
     
     //Pendiente de error message.
-    FILE* autfile = fopen(AUTOMATA_FILE, "r");
+    FILE* autfile = fopen("automatas.txt", "r");
+
     FILE* ifile = Open_InputFile(argc, argv);
+
     FILE* ofile = Open_OutputFile(argc, argv);
     
     char* input_filename = get_input_filename(argc, argv);
