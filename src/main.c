@@ -2,7 +2,7 @@
 #include "./main.h"
 #include "scanner_module/scanner.h"
 #include "input_handler_module/input_handler.h"
-#define AUTOMATA_FILE "../automatas_module/automatas.txt"
+#define AUTOMATA_FILE "automatas.txt"
 
 
 // ------------------ MAIN FUNCTION ------------------
@@ -11,11 +11,12 @@ int main(int argc, char *argv[]) {
     
     //Pendiente de error message.
     FILE* autfile = fopen(AUTOMATA_FILE, "r");
+
     FILE* ifile = Open_InputFile(argc, argv);
     FILE* ofile = Open_OutputFile(argc, argv);
 
     StartScanner(ifile, ofile, autfile);
-
+    fclose(autfile);
     if (ifile != stdin) fclose(ifile);
     if (ofile != stdout) fclose(ofile);
 
