@@ -99,18 +99,15 @@ void print_automaton_info(automaton* automaton, const char* name) {
 
 
 automaton* generate_automatas(FILE* file,int* num_automatas){
-    printf("1");
     fscanf(file, "%d", num_automatas);
     COUNT_IO_N(1);
     // Consumir el newline después del número
     char dummy[MAX_LINE];
     fgets(dummy, MAX_LINE, file);
     COUNT_IO_N(strlen(dummy));
-    printf("2");
     automaton* automatas = malloc((*num_automatas) * sizeof(automaton));
     COUNT_GEN_N(1);
     for (int k = 0; k < (*num_automatas); k++) {
-        printf("3");
         COUNT_COMP_N(1);
         read_automatas(file, &automatas[k]);
         automatas[k].category = k; //Category -1 is reserved to CAT_NONRECONIZED
@@ -136,7 +133,7 @@ state1: 2 0 1
 state2: 0 1 2
 null state: 2
 */
-void read_automatas(FILE* file, automaton* a, FILE* output) {
+void read_automatas(FILE* file, automaton* a) {
     char line[MAX_LINE];
     
     // Consumir línea vacía demarcador
@@ -151,7 +148,7 @@ void read_automatas(FILE* file, automaton* a, FILE* output) {
     
     a->alphabet_size = strlen(alphabet_str);
     if (a->alphabet_size == 0) {
-        error_report(SCANNER_ERR_INVALID_ALPHABET, STEP_SCANNER, __FILE__, __LINE__, output);
+        //error_report(SCANNER_ERR_INVALID_ALPHABET, STEP_SCANNER, __FILE__, __LINE__, a->alphabet_size);
         return;
     }
     COUNT_GEN_N(1);

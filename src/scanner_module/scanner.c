@@ -139,7 +139,7 @@ int find_accepting_automaton(automaton_state_t* states, int num_auto) {
 
 // ============ FUNCIÓN PRINCIPAL DEL SCANNER ============
 
-void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
+void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* input_filename) {
     if (!InputFile || !OutputFile || !Automatafile) {
         fprintf(stderr, "[ERROR] Scanner: Invalid input or output file\n");
 
@@ -158,8 +158,10 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
     };
 
     automaton_state_t states[MAX_AUTOMATA];
+    automaton_state_t lookahstates[MAX_AUTOMATA];
 
     initialize_automaton_states(states, all_automata, num_automata);
+    initialize_automaton_states(lookahstates, all_automata, num_automata);
     fprintf(stdout, "[num auto %d]\n", num_automata);
     
     char token_buffer[TOKEN_BUFFER_SIZE] = DEFAULT_TOKEN;
@@ -184,9 +186,11 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
             int alivedfm = process_automata_transition(states, num_automata, c);
             token_buffer[token_pos] = c;
             token_pos++;
+            printf("\n%c, %i alivedfm", c, alivedfm);
             if (alivedfm != 0)
             {
                 int alivekw = find_accepting_automaton(states, num_automata);
+                printf("\n%c, %i, %i alivedfm", c, alivedfm, alivekw);
                 if (alivekw != -1){
                     next_char = peek_char(&ctx);
                     int alivedfmwithla = can_any_automaton_continue(states, num_automata, next_char);
@@ -201,49 +205,19 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
                     }
                 }
             }else{
-                fprintf(OutputFile, "<%s, %s> ", token_buffer, UNREC);
-                for (int i = 0; i < token_pos; i++)
-                {token_buffer[i] = '\0';}
-                token_pos = 0;
+                next_char = peek_char(&ctx);
+                reset_automaton_states(states, num_automata);
+                int alivekw = process_automata_transition(states, num_automata, next_char);
+                if (alivekw != 0)
+                {
+                    fprintf(OutputFile, "<%s, %s> ", token_buffer, UNREC);
+                    for (int i = 0; i < token_pos; i++)
+                    {token_buffer[i] = '\0';}
+                    token_pos = 0;
+                }
                 reset_automaton_states(states, num_automata);
             }
         }
     }
     free_automatas(all_automata, num_automata);
 }
-
-/*
-// ============ FUNCIÓN DE PRUEBA ============
-void printCasual() {
-    printf("=== SCANNER TEST ===\n");
-    printf("Testing SPECIAL CHARACTERS automaton:\n\n");
-    
-    // Inicializar un autómata de prueba
-    automaton2_t* special = create_special_char_automaton();
-    
-    if (special) {
-        print_automaton_info(special, "SPECIAL_CHARACTERS");
-        
-        // Probar algunos caracteres
-        const char* test_chars = "();{}[],abc";
-        printf("Testing characters:\n");
-        for (int i = 0; test_chars[i] != '\0'; i++) {
-            char c = test_chars[i];
-            int symbol_idx = find_symbol_index(special, c);
-            printf("  '%c' -> ", c);
-            if (symbol_idx != -1) {
-                int next_state = special->transition_matrix[special->initial_state][symbol_idx];
-                printf("Symbol found (idx=%d) -> Next state: %d", symbol_idx, next_state);
-                if (is_accepting_state(special, next_state)) {
-                    printf(" [ACCEPTING]\n");
-                } else {
-                    printf("\n");
-                }
-            } else {
-                printf("NOT IN ALPHABET\n");
-            }
-        }
-        
-        free_automaton(special);
-    }
-}*/
