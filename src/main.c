@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     if (ifile != stdin) fclose(ifile);
     if (ofile != stdout) fclose(ofile);
-    if (autfile) fclose(ofile);
+    if (autfile) fclose(autfile);
 
     return 0;
 }

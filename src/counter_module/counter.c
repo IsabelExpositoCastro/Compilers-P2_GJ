@@ -14,8 +14,15 @@
 
 //global constants
 #define NULL_CHAR '\0'
+#define ZERO_COUNTER_VALUE 0
+#define COUNT_FILENAME_SUFFIX "dbgcnt"
+#define COUNTER_WARNING_LIMIT_REACHED "[COUNTER] Warning: entry limit reached (%d). Additional detailed entries are skipped.\n"
+#define COUNTER_TYPE_COMP "COMP"
+#define COUNTER_TYPE_IO "IO"
+#define COUNTER_TYPE_GEN "GEN"
+#define COUNTER_TYPE_COPY_LEN (MAX_COUNTER_TYPE - 1)
 //Global counters
-static counters counter = {0, 0, 0};
+static counters counter = {ZERO_COUNTER_VALUE, ZERO_COUNTER_VALUE, ZERO_COUNTER_VALUE};
 
 //counters for functions (partial counting)
 static counters func_counters[MAX_FUNCTIONS];
@@ -24,6 +31,7 @@ static int num_functions = 0;
 //variables of registering entries (functions, line, type, amount, partials and total counts)
 static counter_entry entries[MAX_ENTRIES];
 static int num_entries = 0;
+static int entries_overflow_warned = 0;
 
 //global local variables for storing function and line
 static char current_function[MAX_FUNCTION_NAME] = "";
@@ -43,7 +51,7 @@ static char* build_count_filename(const char* input_filename) {
     
     static char filename[MAX_FILENAME];
     strcpy(filename, input_filename);
-    strcat(filename, "dbgcnt");
+    strcat(filename, COUNT_FILENAME_SUFFIX);
     return filename;
 }
 
@@ -87,12 +95,20 @@ static counters* function_entry_manager(const char* function_name) {
  *
  */
 static void register_entry(const char* function_name, int input_line, const char* counter_type, int amount) {
+    if (num_entries >= MAX_ENTRIES) {
+        if (!entries_overflow_warned) {
+            fprintf(stderr, COUNTER_WARNING_LIMIT_REACHED, MAX_ENTRIES);
+            entries_overflow_warned = 1;
+        }
+        return;
+    }
+
     counter_entry* entry = &entries[num_entries];
     strncpy(entry->function_name, function_name, MAX_FUNCTION_NAME - 1);
     entry->function_name[MAX_FUNCTION_NAME - 1] = NULL_CHAR;
     entry->input_line = input_line;
-    strncpy(entry->counter_type, counter_type, 9);
-    entry->counter_type[9] = NULL_CHAR;
+    strncpy(entry->counter_type, counter_type, COUNTER_TYPE_COPY_LEN);
+    entry->counter_type[COUNTER_TYPE_COPY_LEN] = NULL_CHAR;
     entry->amount = amount;
     
     //partial counting
@@ -127,7 +143,7 @@ void add_counter_comp_detailed(const char* function_name, int input_line, int am
         func_entry->count_comp += amount;
     }
     
-    register_entry(function_name, input_line, "COMP", amount);
+    register_entry(function_name, input_line, COUNTER_TYPE_COMP, amount);
 }
 
 /*
@@ -146,7 +162,7 @@ void add_counter_io_detailed(const char* function_name, int input_line, int amou
         func_entry->count_io += amount;
     }
     
-    register_entry(function_name, input_line, "IO", amount);
+    register_entry(function_name, input_line, COUNTER_TYPE_IO, amount);
 }
 
 /*
@@ -165,7 +181,7 @@ void add_counter_gen_detailed(const char* function_name, int input_line, int amo
         func_entry->count_gen += amount;
     }
     
-    register_entry(function_name, input_line, "GEN", amount);
+    register_entry(function_name, input_line, COUNTER_TYPE_GEN, amount);
 }
 
 counters get_counters() {
@@ -206,9 +222,9 @@ void print_partial_counters(char function[], FILE* out) {
             fprintf(out, " (LINE: %d) +%d to counter %s | ", event->input_line, event->amount, event->counter_type);
             
             //partial counting
-            if (strcmp(event->counter_type, "COMP") == 0) {
+            if (strcmp(event->counter_type, COUNTER_TYPE_COMP) == 0) {
                 fprintf(out, "PARTIAL COMP: COMP=%d |", event->partial_comp);
-            } else if (strcmp(event->counter_type, "IO") == 0) {
+            } else if (strcmp(event->counter_type, COUNTER_TYPE_IO) == 0) {
                 fprintf(out, "PARTIAL IO: IO=%d |", event->partial_io);
             } else {
                 fprintf(out, "PARTIAL GEN: GEN=%d |", event->partial_gen);
