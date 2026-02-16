@@ -2,7 +2,7 @@
 #include "./main.h"
 #include "scanner_module/scanner.h"
 #include "input_handler_module/input_handler.h"
-#define AUTOMATA_FILE "../automatas_module/automatas.txt"
+#define AUTOMATA_FILE "automatas.txt"
 
 
 // ------------------ MAIN FUNCTION ------------------
@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
 
     if (ifile != stdin) fclose(ifile);
     if (ofile != stdout) fclose(ofile);
+    if (autfile) fclose(ofile);
 
     return 0;
 }
