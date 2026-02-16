@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include "../automatas_module/automatonDefinition.h"
 
+#define MAX_LENGTH 256
+
 
 // ============ ESTRUCTURA PARA ESTADO DE AUTÓMATA ============
 typedef struct {
-    automaton* automaton;
+    automaton* automaton;   // Puntero al autómata correspondiente
     int current_state;      // Estado actual en el autómata
     int is_active;          // ¿Sigue activo?
 } automaton_state_t;
@@ -15,21 +17,21 @@ typedef struct {
 
 // ============ ESTRUCTURA PARA CANDIDATO DE TOKEN ============
 typedef struct {
-    char buffer[256]; // <- Tremendo magic number.
-    int length;
-    int category;
-    int is_valid;
+    char buffer[MAX_LENGTH];        // Buffer para almacenar el lexema del token
+    int length;                     // Longitud del lexema
+    int category;                   // Categoría del token
+    int is_valid;                  // ¿Es un token válido?
 } token_candidate_t;
 
 
 // ============ ESTRUCTURA DE CONTEXTO DEL SCANNER ============
 typedef struct {
-    FILE* input_file;
-    FILE* output_file;
-    int current_char;
-    int lookahead_char;
-    int line_num;
-    int col_num;
+    FILE* input_file;       // Archivo de entrada
+    FILE* output_file;      // Archivo de salida
+    int current_char;       // Carácter actual leído
+    int lookahead_char;     // Carácter de lookahead (si se ha leído, sino LOOKAHEAD_NOT_READ)
+    int line_num;           // Número de línea actual (inicia en 1)
+    int col_num;            // Número de columna actual (inicia en 0)
 } scanner_context_t;
 
 
