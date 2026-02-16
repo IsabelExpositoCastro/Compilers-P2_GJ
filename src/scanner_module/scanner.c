@@ -38,6 +38,13 @@ static void clear_token_buffer(char* token_buffer, int* token_pos) {
     *token_pos = TOKEN_RESET_POS;
 }
 
+static void emit_unrecognized_if_pending(FILE* output_file, char* token_buffer, int* token_pos) {
+    if (*token_pos > 0) {
+        fprintf(output_file, "<%s, %s> ", token_buffer, UNREC);
+        clear_token_buffer(token_buffer, token_pos);
+    }
+}
+
 
 
 
@@ -227,6 +234,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
 
     while ((c = read_char(&ctx)) != EOF) {
         if (c == CHAR_NEWLINE) {
+            emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
             fprintf(OutputFile, "\n");
             ctx.line_num++;
 
@@ -234,6 +242,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
             clear_token_buffer(token_buffer, &token_pos);
             counter++;
         }else if (c == CHAR_SPACE || c == CHAR_TAB || c == CHAR_CARRIAGE_RETURN) {
+            emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
             reset_automaton_states(states, num_automata);
             clear_token_buffer(token_buffer, &token_pos);
         }else{
@@ -261,18 +270,12 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
                     }
                 }
             }else{
-                next_char = peek_char(&ctx);
-                reset_automaton_states(states, num_automata);
-                int alivekw = process_automata_transition(states, num_automata, next_char);
-                if (alivekw != 0)
-                {
-                    fprintf(OutputFile, "<%s, %s> ", token_buffer, UNREC);
-                    clear_token_buffer(token_buffer, &token_pos);
-                }
+                emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
                 reset_automaton_states(states, num_automata);
             }
         }
         
     }
+    emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
     free_automatas(all_automata, num_automata);
 }
