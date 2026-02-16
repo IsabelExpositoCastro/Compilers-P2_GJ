@@ -36,8 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-
+#include "../error_handler_module/error_handler.h"
 
 // ------------------- FUNCTIONS --------------------
 FILE* Open_InputFile(int argc, char* argv[]) {

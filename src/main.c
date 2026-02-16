@@ -13,6 +13,7 @@ int main(int argc, char *argv[]) {
     FILE* autfile = fopen(AUTOMATA_FILE, "r");
     FILE* ifile = Open_InputFile(argc, argv);
     FILE* ofile = Open_OutputFile(argc, argv);
+    
     char* input_filename = get_input_filename(argc, argv);
     StartScanner(ifile, ofile, autfile,input_filename);
 

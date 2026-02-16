@@ -2,6 +2,7 @@
 #define ERROR_HANDLER_H
 
 #include <stdarg.h>
+#include <stdio.h>
 
 /* ===== STEP IDENTIFIERS ===== */
 typedef enum { 
@@ -52,9 +53,11 @@ void error_handler_init(int *debug_flag);
  * @param line: line number where error occurred
  * @param ...: parameters to format the error message (printf-style)
  * 
- * Only prints if DEBUG flag is 1
+ * Behavior:
+ * - If `DEBUG == 0` the message is printed to `stdout`.
+ * - If `DEBUG == 1` the message is printed to the provided `FILE *out` (falls back to `stdout` if NULL).
  */
-void error_report(ErrorID error_id, ErrorStep step, const char *file, int line, ...);
+void error_report(ErrorID error_id, ErrorStep step, const char *file, int line, FILE *out, ...);
 
 /**
  * Get error message template by ID

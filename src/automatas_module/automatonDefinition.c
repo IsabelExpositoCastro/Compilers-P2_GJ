@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "../counter_module/counter.h"
 #include "../preprocesor_variables.h"
+#include "../error_handler_module/error_handler.h"
 #define MAX_LINE 256
 #define NO_NULL_STATE -1
 
@@ -133,7 +134,7 @@ state1: 2 0 1
 state2: 0 1 2
 null state: 2
 */
-void read_automatas(FILE* file, automaton* a) {
+void read_automatas(FILE* file, automaton* a, FILE* output) {
     char line[MAX_LINE];
     
     // Consumir línea vacía demarcador
@@ -147,6 +148,10 @@ void read_automatas(FILE* file, automaton* a) {
     COUNT_GEN_N(1);
     
     a->alphabet_size = strlen(alphabet_str);
+    if (a->alphabet_size == 0) {
+        error_report(SCANNER_ERR_INVALID_ALPHABET, STEP_SCANNER, __FILE__, __LINE__, output);
+        return;
+    }
     COUNT_GEN_N(1);
     a->alphabet = malloc(a->alphabet_size + 1);
     COUNT_GEN_N(1);

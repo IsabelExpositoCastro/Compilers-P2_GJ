@@ -38,7 +38,7 @@ void print_automaton_info(automaton* automaton, const char* name);
 
 
 
-void read_automatas(FILE* file, automaton* a);
+void read_automatas(FILE* file, automaton* a, FILE* output);
 automaton* generate_automatas(FILE* file, int* num_automatas);
 void free_automaton(automaton* a);
 void free_automatas(automaton* automatas, int num_automatas);

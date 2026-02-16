@@ -1,10 +1,11 @@
 #include "error_handler.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
+#include "preprocesor_variables.h"
 
 
 
-static int *debug_flag_ptr = NULL; 
 
 
 static const Errors error_messages[] = {
@@ -17,10 +18,11 @@ static const Errors error_messages[] = {
     {
         SCANNER_ERR_INVALID_ARGUMENTS,
         STEP_SCANNER,
-        "Invalid arguments provided to the program, print -help for usage information"
+        "Invalid arguments provided to the program, write the program input in the terminal or provide a file as argument"
     },
     {
         SCANNER_ERR_FOUND_NON_RECOGNIZABLE,
+        
         STEP_SCANNER,
         "Found non-recognizable token: '%s'"
     }, 
@@ -96,7 +98,7 @@ static const Errors* find_error(ErrorID error_id) {
 //funciones principales
 
 void error_handler_init(int *debug_flag) {
-    debug_flag_ptr = debug_flag;
+    (void)debug_flag;
 }
 
 const char* error_get_message(ErrorID error_id) {
@@ -104,24 +106,25 @@ const char* error_get_message(ErrorID error_id) {
     return err_def ? err_def->message : "Unknown error";
 }
 
-void error_report(ErrorID error_id, ErrorStep step, const char *file, int line, ...) {
-    // Check if debug flag is enabled
-    if (debug_flag_ptr && *debug_flag_ptr) {
-        // Find the error definition based on the error ID
-        const Errors *err_def = find_error(error_id);
-        if (err_def) {
-            // Initialize variadic arguments, we do not know how many parameters or their types, 
-            // so we rely on the error message template to format them correctly
-            va_list args;
-            va_start(args, line);
+void error_report(ErrorID error_id, ErrorStep step, const char *file, int line, FILE *out, ...) {
+    const Errors *err_def = find_error(error_id);
+    if (!err_def) return;
 
-            // Print the error to stderr (or log file if needed)
-            fprintf(stdout, "[%s] Error in file %s at line %d: ", step_name(step), file, line);
-            vfprintf(stdout, err_def->message, args); //Print message depending on the template and provided parameters
-            fprintf(stdout, "\n");
-
-            // Clean up variadic arguments
-            va_end(args);
-        }
+#if DEBUG == 0
+    FILE *target = stdout;
+#else
+    FILE *target = out ? out : stdout;
+    if(target == NULL) {
+        target = stdout; 
     }
+#endif
+
+    va_list args;
+    va_start(args, out);
+
+    fprintf(target, "[%s] Error in file %s at line %d: ", step_name(step), file, line);
+    vfprintf(target, err_def->message, args);
+    fprintf(target, "\n");
+
+    va_end(args);
 }

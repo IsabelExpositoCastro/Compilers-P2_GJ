@@ -36,7 +36,7 @@ void get_args(int argc, char *argv[], int *output_mode, char **input_file_name) 
 
     // Ensure there are at least 2 arguments (program name + 1 flag + 1 file)
     if (argc < MIN_ARGS) {
-        error_report(SCANNER_ERR_INVALID_ARGUMENTS, STEP_SCANNER, __FILE__, __LINE__);
+        error_report(SCANNER_ERR_INVALID_ARGUMENTS, STEP_SCANNER, __FILE__, __LINE__, NULL);
         return;
     }
 
@@ -54,14 +54,14 @@ void get_args(int argc, char *argv[], int *output_mode, char **input_file_name) 
             *input_file_name = argv[i];
         } else {
             // If any invalid flags are found
-            error_report(SCANNER_ERR_INVALID_ARGUMENTS, STEP_SCANNER, __FILE__, __LINE__);
+            error_report(SCANNER_ERR_INVALID_ARGUMENTS, STEP_SCANNER, __FILE__, __LINE__, NULL);
             return;
         }
     }
 
     // If no input file was specified
     if (*input_file_name == NULL) {
-        error_report(SCANNER_ERR_INVALID_FILE_FORMAT, STEP_SCANNER, __FILE__, __LINE__, "Missing input file", "No input file provided");
+        error_report(SCANNER_ERR_INVALID_FILE_FORMAT, STEP_SCANNER, __FILE__, __LINE__, NULL, "Missing input file", "No input file provided");
     }
 }
 
