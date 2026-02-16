@@ -19,4 +19,4 @@
 # Add utils library from the top-level src folder
 add_library(automatas_module automatonDefinition.c)
 target_include_directories(automatas_module PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(automatas_module PRIVATE utils)
+target_link_libraries(automatas_module PRIVATE utils counter_module)
