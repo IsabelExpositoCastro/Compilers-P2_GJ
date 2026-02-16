@@ -42,11 +42,42 @@ static void clear_token_buffer(char* token_buffer, int* token_pos) {
     COUNT_GEN_N(1);
 }
 
-static void emit_unrecognized_if_pending(FILE* output_file, char* token_buffer, int* token_pos) {
+static void start_output_line_if_needed(FILE* output_file, int line_number, int* line_has_tokens) {
+    COUNT_COMP_N(1);
+    if (*line_has_tokens) return;
+
+#if OUTFORMAT == DEBUG
+    fprintf(output_file, "%d ", line_number);
+    COUNT_IO_N(1);
+#endif
+    *line_has_tokens = 1;
+    COUNT_GEN_N(1);
+}
+
+static void emit_token(FILE* output_file, const char* lexeme, const char* category, int line_number, int* line_has_tokens) {
+    start_output_line_if_needed(output_file, line_number, line_has_tokens);
+    fprintf(output_file, "<%s, %s> ", lexeme, category);
+    COUNT_IO_N(1);
+}
+
+static void flush_output_line(FILE* output_file, int* line_has_tokens) {
+    COUNT_COMP_N(1);
+    if (!*line_has_tokens) return;
+
+    fprintf(output_file, "\n");
+    COUNT_IO_N(1);
+#if OUTFORMAT == DEBUG
+    fprintf(output_file, "\n");
+    COUNT_IO_N(1);
+#endif
+    *line_has_tokens = 0;
+    COUNT_GEN_N(1);
+}
+
+static void emit_unrecognized_if_pending(FILE* output_file, char* token_buffer, int* token_pos, int line_number, int* line_has_tokens) {
     COUNT_COMP_N(1);
     if (*token_pos > 0) {
-        fprintf(output_file, "<%s, %s> ", token_buffer, UNREC);
-        COUNT_IO_N(1);
+        emit_token(output_file, token_buffer, UNREC, line_number, line_has_tokens);
         clear_token_buffer(token_buffer, token_pos);
     }
 }
@@ -79,14 +110,8 @@ int read_char(scanner_context_t* ctx) {
         COUNT_GEN_N(1);
     }
     
-    COUNT_COMP_N(2);
-    if (c == CHAR_NEWLINE) {
-        ctx->line_num++;
-        ctx->col_num = FIRST_COLUMN_NUMBER;
-        COUNT_GEN_N(2);
-        COUNT_IO_N(1);
-
-    } else if (c != EOF) {
+    COUNT_COMP_N(1);
+    if (c != EOF) {
         ctx->col_num++;
         COUNT_GEN_N(1);
     }
@@ -304,6 +329,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
     char* category_name;
     int next_char;
     int counter = 0;
+    int line_has_tokens = 0;
     COUNT_GEN_N(7);
 
     
@@ -311,10 +337,11 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
         COUNT_IO_N(1);
         COUNT_COMP_N(2);
         if (c == CHAR_NEWLINE) {
-            emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
-            fprintf(OutputFile, "\n");
-            COUNT_IO_N(1);
+            emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos, ctx.line_num, &line_has_tokens);
+            flush_output_line(OutputFile, &line_has_tokens);
             ctx.line_num++;
+            COUNT_GEN_N(1);
+            ctx.col_num = FIRST_COLUMN_NUMBER;
             COUNT_GEN_N(1);
 
             reset_automaton_states(states, num_automata);
@@ -325,7 +352,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
 
         
         }else if (c == CHAR_SPACE || c == CHAR_TAB || c == CHAR_CARRIAGE_RETURN) {
-            emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
+            emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos, ctx.line_num, &line_has_tokens);
             reset_automaton_states(states, num_automata);
             clear_token_buffer(token_buffer, &token_pos);
             COUNT_COMP_N(3);
@@ -357,20 +384,20 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* i
                         //printf("\n%i,  %c, %i, %i, %i",counter, c, alivedfm, alivekw, alivedfmwithla);
                         continue;
                     }else{
-                        fprintf(OutputFile, "<%s, %s> ", token_buffer, states[alivekw].automaton->category_name );
-                        COUNT_IO_N(1);
+                        emit_token(OutputFile, token_buffer, states[alivekw].automaton->category_name, ctx.line_num, &line_has_tokens);
                         clear_token_buffer(token_buffer, &token_pos);
                         reset_automaton_states(states, num_automata);
                     }
                 }
             }else{
-                emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
+                emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos, ctx.line_num, &line_has_tokens);
                 reset_automaton_states(states, num_automata);
             }
         }
         
     }
-    emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos);
+    emit_unrecognized_if_pending(OutputFile, token_buffer, &token_pos, ctx.line_num, &line_has_tokens);
+    flush_output_line(OutputFile, &line_has_tokens);
     write_counters(OutputFile, input_filename);
     COUNT_IO_N(1);
     free_automatas(all_automata, num_automata);

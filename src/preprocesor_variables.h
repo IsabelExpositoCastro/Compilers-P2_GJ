@@ -1,9 +1,12 @@
-//Put RELEASE to deactivate counters
+// Output formats
+#define RELEASE 0
+#define DEBUG 1
+
+// Select output format
 #define OUTFORMAT DEBUG
 
 
 #if OUTFORMAT == DEBUG
-    #define DEBUG 1 //Change to 0 to stdout, change to 1 to output file
     #define COUNTCONFIG
     #define COUNTOUT 0 //1 to output file, 0 to countfile
     
