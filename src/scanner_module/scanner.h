@@ -35,7 +35,7 @@ typedef struct {
 
 // --------------- FUNCTION PROTOTYPES ---------------
 void printCasual();
-void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Autfile);
+void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Autfile,char* input_filename);
 
 // Funciones internas del scanner
 int peek_char(scanner_context_t* ctx);

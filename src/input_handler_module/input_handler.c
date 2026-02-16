@@ -52,7 +52,12 @@ FILE* Open_InputFile(int argc, char* argv[]) {
     return stdin;
 }
 
-
+char* get_input_filename(int argc, char* argv[]) {
+    if (argc > 1) {
+        return argv[1];
+    }
+    return NULL; 
+}
 // Builds the output filename by appending the "scn" suffix to the input filename.
 // Example: example.c -> example.cscn
 

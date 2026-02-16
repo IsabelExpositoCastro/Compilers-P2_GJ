@@ -15,6 +15,11 @@ static const Errors error_messages[] = {
         "Invalid character '%c' found"
     },
     {
+        SCANNER_ERR_INVALID_ARGUMENTS,
+        STEP_SCANNER,
+        "Invalid arguments provided to the program, print -help for usage information"
+    },
+    {
         SCANNER_ERR_FOUND_NON_RECOGNIZABLE,
         STEP_SCANNER,
         "Found non-recognizable token: '%s'"
@@ -111,9 +116,9 @@ void error_report(ErrorID error_id, ErrorStep step, const char *file, int line, 
             va_start(args, line);
 
             // Print the error to stderr (or log file if needed)
-            fprintf(stderr, "[%s] Error in file %s at line %d: ", step_name(step), file, line);
-            vfprintf(stderr, err_def->message, args); //Print message depending on the template and provided parameters
-            fprintf(stderr, "\n");
+            fprintf(stdout, "[%s] Error in file %s at line %d: ", step_name(step), file, line);
+            vfprintf(stdout, err_def->message, args); //Print message depending on the template and provided parameters
+            fprintf(stdout, "\n");
 
             // Clean up variadic arguments
             va_end(args);

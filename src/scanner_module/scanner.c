@@ -138,7 +138,7 @@ int find_accepting_automaton(automaton_state_t* states, int num_auto) {
 
 // ============ FUNCIÓN PRINCIPAL DEL SCANNER ============
 
-void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
+void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile, char* input_filename) {
     if (!InputFile || !OutputFile) {
         fprintf(stderr, "[ERROR] Scanner: Invalid input or output file\n");
         return;
@@ -248,6 +248,7 @@ void StartScanner(FILE* InputFile, FILE* OutputFile, FILE* Automatafile) {
         }
     }
     // Print counters summary and free resources
+    write_counters(OutputFile, input_filename); // Assuming we want to write to the same output file
     free_automatas(all_automata, num_automata);
 }
 
