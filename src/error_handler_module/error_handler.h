@@ -14,6 +14,7 @@ typedef enum {
     //scanner errors
     SCANNER_ERR_INVALID_CHARACTER = 1001, //Not sure
     SCANNER_ERR_FOUND_NON_RECOGNIZABLE = 1003,
+    SCANNER_ERR_INVALID_ARGUMENTS = 1002,
     //scanner errors related to automata definition reading
     SCANNER_ERR_INVALID_FILE_FORMAT = 1004,
     SCANNER_ERR_INVALID_ALPHABET = 1005,

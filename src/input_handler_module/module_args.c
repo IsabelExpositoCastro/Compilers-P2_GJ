@@ -20,7 +20,7 @@
  */
 
 #include "module_args.h"
-
+#include "../error_handler_module/error_handler.h"
 // Function to print the arguments (optional for debugging)
 void print_arguments(int argc, char *argv[]) {
     printf("Arguments received (%d):\n", argc);
@@ -68,7 +68,7 @@ void get_args(int argc, char *argv[], int *output_mode, char **input_file_name) 
 // Function to print the help message
 void print_manHelp(void) {
     printf("Usage: ./program [options] <file_path>\n");
-    printf("Options:\n");
+    printf("Options (only for errors):\n");
     printf("-d        Enable debug mode\n");
     printf("-r        Enable release mode\n");
     printf("-help     Display this help message\n");
